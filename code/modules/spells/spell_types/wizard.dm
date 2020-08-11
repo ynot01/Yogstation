@@ -173,15 +173,6 @@
 
 	summon_type = list(/obj/effect/timestop/wizard)
 
-/obj/effect/proc_holder/spell/aoe_turf/conjure/timestop/zlevel //currently adminbus only, 64 tile radius timestop, if triggered at bridge, will reach library
-	name = "The World"
-	clothes_req = TRUE
-	invocation = "ZA WARUDO"
-	summon_type = list(/obj/effect/timestop/zlevel)
-
-/obj/effect/proc_holder/spell/aoe_turf/conjure/timestop/zlevel/robeless //easier for bus
-	clothes_req = FALSE
-
 /obj/effect/proc_holder/spell/aoe_turf/conjure/carp
 	name = "Summon Carp"
 	desc = "This spell conjures a simple carp."

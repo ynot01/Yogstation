@@ -578,7 +578,7 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 			if(CONFIG_GET(flag/disable_human_mood))
 				dat += "<b>Mood:</b> <a href='?_src_=prefs;preference=mood'>[yogtoggles & PREF_MOOD ? "Enabled" : "Disabled"]</a><br>"
 			//yogs end
-
+			dat += "<b>Antag Mulligan:</b> <a href='?_src_=prefs;preference=antagmulligan'>[yogtoggles & PREF_ANTAGMULLIGAN ? "Enabled" : "Disabled"]</a><br>"
 			dat += "</td><td width='300px' height='300px' valign='top'>"
 
 			dat += "<h2>Special Role Settings</h2>"
@@ -1719,6 +1719,9 @@ GLOBAL_LIST_EMPTY(preferences_datums)
 
 				if("mood")
 					yogtoggles ^= PREF_MOOD
+
+				if("antagmulligan")
+					yogtoggles ^= PREF_ANTAGMULLIGAN
 				// yogs end
 
 	ShowChoices(user)

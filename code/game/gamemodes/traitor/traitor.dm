@@ -77,6 +77,10 @@
 /datum/game_mode/traitor/post_setup()
 	for(var/datum/mind/traitor in pre_traitors)
 		var/datum/antagonist/traitor/new_antag = new antag_datum()
+		var/client/cli
+		if(cli.prefs.yogtoggles & PREF_ANTAGMULLIGAN)
+			var/mob/living/carbon/human/U
+			randomize_human(U)
 		addtimer(CALLBACK(traitor, /datum/mind.proc/add_antag_datum, new_antag), rand(10,100))
 	if(!exchange_blue)
 		exchange_blue = -1 //Block latejoiners from getting exchange objectives

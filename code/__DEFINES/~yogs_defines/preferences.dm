@@ -13,5 +13,6 @@
 
 #define QUIET_ROUND				(1<<0) //Donor features, quiet round; in /~yogs_defines/, as god intended
 #define PREF_MOOD				(1<<1) //Toggles the use of the Mood feature. Defaults to off, thank god.
+#define PREF_ANTAGMULLIGAN		(1<<2) //Toggles antag mulligan, randomizing your character upon rolling antag.
 
 #define YOGTOGGLES_DEFAULT 0

@@ -77,6 +77,10 @@ GLOBAL_LIST_EMPTY(antagonists)
 		give_antag_moodies()
 		if(is_banned(owner.current) && replace_banned)
 			replace_banned_player()
+		var/client/cli
+		if(istype(owner, /mob/living/carbon/human) && (cli.prefs.yogtoggles & PREF_ANTAGMULLIGAN))
+			var/mob/living/carbon/human/U
+			randomize_human(U)
 		else if(owner.current.client?.holder && (CONFIG_GET(flag/auto_deadmin_antagonists) || owner.current.client.prefs?.toggles & DEADMIN_ANTAGONIST))
 			owner.current.client.holder.auto_deadmin()
 

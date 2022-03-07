@@ -14,6 +14,11 @@
 			C.bloodiness += bloodiness
 	return ..()
 
+/obj/effect/decal/cleanable/blood/Crossed(atom/movable/L)
+	if(prob(10) && iscarbon(L))
+		L.slip(80, src)
+	. = ..()
+
 /obj/effect/decal/cleanable/blood/old
 	name = "dried blood"
 	desc = "Looks like it's been here a while.  Eew."

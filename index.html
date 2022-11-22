@@ -29,8 +29,8 @@ General Public License version 3.
 
 
 <h3 id="modules">Modules
-<aside>(469 modules,
-    721/7437 macros, 9.7%)</aside></h3>
+<aside>(470 modules,
+    724/7449 macros, 9.7%)</aside></h3>
 <ul class="index-tree modules">
     <li class="has-children"><span title="code">code</span><ul class="index-tree">
     <li class="has-children"><span title="code&#x2F;__DEFINES">__DEFINES</span><ul class="index-tree">
@@ -150,6 +150,7 @@ These materials call on_applied() on whatever item they are applied to, common e
     </ul></li>
     <li class="has-children"><a href="code/datums/martial.html" title="code&#x2F;datums&#x2F;martial">martial</a><ul class="index-tree">
     <li><a href="code/datums/martial/cqc.html" title="code&#x2F;datums&#x2F;martial&#x2F;cqc">cqc</a></li>
+    <li><a href="code/datums/martial/ultra_violence.html" title="code&#x2F;datums&#x2F;martial&#x2F;ultra_violence">ultra_violence</a></li>
     </ul></li>
     <li class="has-children"><span title="code&#x2F;datums&#x2F;materials">materials</span><ul class="index-tree">
     <li><a href="code/datums/materials/_material.html" title="code&#x2F;datums&#x2F;materials&#x2F;_material">_material</a> - Material datum</li>
@@ -730,7 +731,7 @@ transformations and other events that cause new languages to become available.</
 
 
 <h3 id="types">Types
-<aside>(546 detailed/1202 documented/26673 total, 4.5%)</aside></h3>
+<aside>(551 detailed/1208 documented/26754 total, 4.5%)</aside></h3>
 <ul class="index-tree">
     <li><a href="global.html" title="(global)">(global)</a></li>
     <li class="has-children"><a href="area.html" title="&#x2F;area">area</a> - A grouping of tiles into a logical space, mostly used by map editors<ul class="index-tree">
@@ -1174,7 +1175,7 @@ note of an instrument.*</li>
     <li class="has-children"><a href="datum/map_generator.html" title="&#x2F;datum&#x2F;map_generator">map_generator</a> - This type is responsible for any map generation behavior that is done in areas, override this to allow for area-specific map generation. This generation is ran by areas in initialize.<ul class="index-tree">
     <li class="has-children"><a href="datum/map_generator/cave_generator.html" title="&#x2F;datum&#x2F;map_generator&#x2F;cave_generator">Cave Generator</a><ul class="index-tree">
     <li><a href="datum/map_generator/cave_generator/icemoon.html" title="&#x2F;datum&#x2F;map_generator&#x2F;cave_generator&#x2F;icemoon">icemoon</a> - Spawning isn't done in procs to save on overhead on the 60k turfs we're going through.</li>
-    <li><a href="datum/map_generator/cave_generator/lavaland.html" title="&#x2F;datum&#x2F;map_generator&#x2F;cave_generator&#x2F;lavaland">lavaland</a></li>
+    <li><a href="datum/map_generator/cave_generator/lavaland.html" title="&#x2F;datum&#x2F;map_generator&#x2F;cave_generator&#x2F;lavaland">Lavaland Base</a></li>
     </ul></li>
     </ul></li>
     <li><span class="no-substance" title="&#x2F;datum&#x2F;map_preloader">map_preloader</span> - Preloader datum</li>
@@ -1247,6 +1248,7 @@ note of an instrument.*</li>
     <li><a href="datum/martial_art/gardern_warfare.html" title="&#x2F;datum&#x2F;martial_art&#x2F;gardern_warfare">Garden Warfare</a></li>
     <li><a href="datum/martial_art/hunterfu.html" title="&#x2F;datum&#x2F;martial_art&#x2F;hunterfu">Hunter-Fu</a></li>
     <li><a href="datum/martial_art/stealth.html" title="&#x2F;datum&#x2F;martial_art&#x2F;stealth">Stealth</a></li>
+    <li><a href="datum/martial_art/ultra_violence.html" title="&#x2F;datum&#x2F;martial_art&#x2F;ultra_violence">Ultra Violence</a></li>
     </ul></li>
     <li class="has-children"><a href="datum/material.html" title="&#x2F;datum&#x2F;material">material</a><ul class="index-tree">
     <li><span class="no-substance" title="&#x2F;datum&#x2F;material&#x2F;bananium">bananium</span> - Honks and slips</li>
@@ -1668,8 +1670,8 @@ Place a pool filter somewhere in the pool if you want people to be able to modif
     </ul></li>
     <li><a href="obj/effect/reality_smash.html" title="&#x2F;obj&#x2F;effect&#x2F;reality_smash">&#x2F;improper reality smash</a></li>
     <li class="has-children"><span class="no-substance">spawner&#x2F;</span><span title="&#x2F;obj&#x2F;effect&#x2F;spawner&#x2F;lootdrop">lootdrop</span><ul class="index-tree">
-    <li><span class="no-substance" title="&#x2F;obj&#x2F;effect&#x2F;spawner&#x2F;lootdrop&#x2F;armory_contraband">armory contraband gun spawner</span> - obj/item/organ/tongue/ethereal,</li>
     <li><span class="no-substance" title="&#x2F;obj&#x2F;effect&#x2F;spawner&#x2F;lootdrop&#x2F;lavaland_surface_ufo_crash">alien tile</span> - Loot Spawner For UFO</li>
+    <li><span class="no-substance" title="&#x2F;obj&#x2F;effect&#x2F;spawner&#x2F;lootdrop&#x2F;plushies">random plushie</span> - obj/item/organ/tongue/ethereal,</li>
     <li><a href="obj/effect/spawner/lootdrop/randomdrink.html" title="&#x2F;obj&#x2F;effect&#x2F;spawner&#x2F;lootdrop&#x2F;randomdrink">randomdrink</a></li>
     <li><a href="obj/effect/spawner/lootdrop/randomfood.html" title="&#x2F;obj&#x2F;effect&#x2F;spawner&#x2F;lootdrop&#x2F;randomfood">randomfood</a></li>
     </ul></li>
@@ -1830,9 +1832,12 @@ Puts in old analyzer</li>
     <li><span class="no-substance">clockwork&#x2F;</span><span class="no-substance" title="&#x2F;obj&#x2F;item&#x2F;clockwork&#x2F;construct_chassis">construct chassis</span> - shitcode</li>
     <li class="has-children"><a href="obj/item/clothing.html" title="&#x2F;obj&#x2F;item&#x2F;clothing">clothing</a><ul class="index-tree">
     <li class="has-children"><a href="obj/item/clothing/head.html" title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head">head</a><ul class="index-tree">
-    <li class="has-children"><span class="no-substance" title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;helmet">helmet</span><ul class="index-tree">
+    <li class="has-children"><span title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;helmet">helmet</span><ul class="index-tree">
     <li><span class="no-substance" title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;helmet&#x2F;plated">empty plated helmet</span> - PLATED ARMOR</li>
-    <li><span class="no-substance">space&#x2F;hardsuit&#x2F;</span><span class="no-substance" title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;helmet&#x2F;space&#x2F;hardsuit&#x2F;deathsquad">MK.III SWAT Helmet</span> - Deathsquad version</li>
+    <li class="has-children"><span title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;helmet&#x2F;space">space</span><ul class="index-tree">
+    <li><span class="no-substance">hardsuit&#x2F;</span><span class="no-substance" title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;helmet&#x2F;space&#x2F;hardsuit&#x2F;deathsquad">MK.III SWAT Helmet</span> - Deathsquad version</li>
+    <li><a href="obj/item/clothing/head/helmet/space/plasmaman.html" title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;helmet&#x2F;space&#x2F;plasmaman">purple envirosuit helmet</a></li>
+    </ul></li>
     </ul></li>
     <li><a href="obj/item/clothing/head/soft.html" title="&#x2F;obj&#x2F;item&#x2F;clothing&#x2F;head&#x2F;soft">cargo cap</a></li>
     </ul></li>
@@ -1896,6 +1901,8 @@ the program that displays laws should always be usable, and the exceptions were 
 This has a shitload of vars on it, and I'm sorry for that, but it does make making new subtypes really easy<ul class="index-tree">
     <li><span class="no-substance">automatic&#x2F;pistol&#x2F;</span><a href="obj/item/gun/ballistic/automatic/pistol/martial.html" title="&#x2F;obj&#x2F;item&#x2F;gun&#x2F;ballistic&#x2F;automatic&#x2F;pistol&#x2F;martial">martial</a> - I don't check does the user have an item in a hand, because it is a martial art action, and to use it... you need to have a empty hand</li>
     <li><span class="no-substance">bow&#x2F;energy&#x2F;</span><a href="obj/item/gun/ballistic/bow/energy/syndicate.html" title="&#x2F;obj&#x2F;item&#x2F;gun&#x2F;ballistic&#x2F;bow&#x2F;energy&#x2F;syndicate">Syndicate Hardlight Bow</a></li>
+    <li><span class="no-substance">revolver&#x2F;</span><span class="no-substance" title="&#x2F;obj&#x2F;item&#x2F;gun&#x2F;ballistic&#x2F;revolver&#x2F;martial">martial</span> - I don't check does the user have an item in a hand, because it is a martial art action, and to use it... you need to have a empty hand</li>
+    <li><span class="no-substance">shotgun&#x2F;</span><a href="obj/item/gun/ballistic/shotgun/martial.html" title="&#x2F;obj&#x2F;item&#x2F;gun&#x2F;ballistic&#x2F;shotgun&#x2F;martial">martial</a> - I don't check does the user have an item in a hand, because it is a martial art action, and to use it... you need to have a empty hand</li>
     </ul></li>
     <li class="has-children"><span title="&#x2F;obj&#x2F;item&#x2F;gun&#x2F;energy">energy</span><ul class="index-tree">
     <li><a href="obj/item/gun/energy/beam_rifle.html" title="&#x2F;obj&#x2F;item&#x2F;gun&#x2F;energy&#x2F;beam_rifle">particle acceleration rifle</a></li>
@@ -2025,15 +2032,17 @@ Given to Nuke Ops members.</li>
     </ul></li>
     </ul></li>
     </ul></li>
-    <li class="has-children"><span title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork">paperwork</span><ul class="index-tree">
+    <li class="has-children"><a href="obj/item/paper/paperwork.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork">paperwork</a> - A General Request Form for things without a form<ul class="index-tree">
     <li><a href="obj/item/paper/paperwork/complaint_form.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;complaint_form">Complaint Form (Form NT-021)</a> - A complaint form for tattling against coworkers</li>
     <li><a href="obj/item/paper/paperwork/cyborg_request_form.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;cyborg_request_form">Cyborgization Consent Form (Form NT-203)</a> - A form signifying the signer consents to being borged.</li>
-    <li><a href="obj/item/paper/paperwork/general_request_form.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;general_request_form">General Requests Form (Form NT-010)</a> - A General Request Form for things without a form</li>
     <li><a href="obj/item/paper/paperwork/hop_job_change_form.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;hop_job_change_form">Job Reassignment Form (Form NT-059)</a> - A form for requesting a job change</li>
     <li><a href="obj/item/paper/paperwork/hopaccessrequestform.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;hopaccessrequestform">HoP Access Request Form (Form NT-022)</a> - A form for requesting more access</li>
     <li><a href="obj/item/paper/paperwork/incident_report.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;incident_report">Incident Report (Form NT-400)</a> - A form for reporting incidents.</li>
     <li><a href="obj/item/paper/paperwork/item_form.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;item_form">Item Request Form (Form NT-089)</a> - A form for requesting an item.</li>
     <li><a href="obj/item/paper/paperwork/jobchangecert.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;jobchangecert">Job Change Certificate</a> - A form for signifying someone got a job change.</li>
+    <li class="has-children"><a href="obj/item/paper/paperwork/literacytest.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;literacytest">Literacy Test for NT Employees (Form NT-43)</a> - A form for testing employee literacy.<ul class="index-tree">
+    <li><a href="obj/item/paper/paperwork/literacytest/answers.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;literacytest&#x2F;answers">Literacy Test Answers (NT-44)</a> - The answer key to the literacy test.</li>
+    </ul></li>
     <li><a href="obj/item/paper/paperwork/mech_form.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;mech_form">R&amp;D Mech Request Form (Form SCI-9)</a> - A form for requesting a mech.</li>
     <li><a href="obj/item/paper/paperwork/rd_form.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;rd_form">R&amp;D Request Form (Form SCI-3)</a> - A form for requesting something be researched.</li>
     <li><a href="obj/item/paper/paperwork/sec_incident_report.html" title="&#x2F;obj&#x2F;item&#x2F;paper&#x2F;paperwork&#x2F;sec_incident_report">Security Incident Report (Form SEC-030)</a> - An incident form for security officers</li>
@@ -2385,7 +2394,7 @@ uranium</li>
 </main>
 <footer>
     yogstation.dme
-    <a href="https://github.com/ynot01/Yogstation/tree/f6f05371b5de34f4f69218bc9b98e7ece22ee8f3">f6f0537</a>
+    <a href="https://github.com/ynot01/Yogstation/tree/a928c1351cc3d4833bf645ffc4a13b68dd04555a">a928c13</a>
         (master) &mdash; <a href="https://github.com/SpaceManiac/SpacemanDMM/blob/master/src/dmdoc/README.md">dmdoc 1.4.0</a></footer>
 </body>
 </html>

@@ -251,7 +251,8 @@
 		if(COOLDOWN_FINISHED(src, startsoundcooldown))
 			playsound(owner, 'sound/effects/spinal_implant_on.ogg', 60)
 			COOLDOWN_START(src, startsoundcooldown, 1 SECONDS)
-		owner.add_movespeed_modifier("spinalimplant", priority=100, multiplicative_slowdown=-1)
+		owner.add_movespeed_modifier("spinalimplant", priority=100, multiplicative_slowdown=-0.7)
+		ADD_TRAIT(owner, TRAIT_RESISTDAMAGESLOWDOWN, "spinalimplant")
 		owner.next_move_modifier *= 0.7
 		owner?.dna?.species?.action_speed_coefficient *= 0.7
 		RegisterSignal(owner, COMSIG_MOVABLE_PRE_MOVE, .proc/move_react)
@@ -262,6 +263,7 @@
 		owner.next_move_modifier /= 0.7
 		owner?.dna?.species?.action_speed_coefficient /= 0.7
 		owner.remove_movespeed_modifier("spinalimplant")
+		REMOVE_TRAIT(owner, TRAIT_RESISTDAMAGESLOWDOWN, "spinalimplant")
 		UnregisterSignal(owner, COMSIG_MOVABLE_PRE_MOVE)
 	on = !on
 	if(!silent)

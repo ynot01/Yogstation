@@ -58,11 +58,23 @@
 /obj/structure/closet/crate/secure/gear/donut
 	var/donutsleft = 10
 
+/obj/structure/closet/crate/secure/gear/donut/process(delta_time)
+	. = ..()
+	if(DT_PROB(25, delta_time))
+		donutsleft = min(donutsleft + 1, 10)
+
 /obj/structure/closet/crate/secure/gear/donut/open(mob/living/user)
 	. = ..()
-	if(donutsleft > 0)
-		new /obj/item/reagent_containers/food/snacks/donut(src)
-		donutsleft--
+	var/donuts_in_me = 0
+	var/turf/T = get_turf(src)
+	for(var/obj/item/reagent_containers/food/snacks/donut/D in T.GetAllContents())
+		donuts_in_me++
+	if(donutsleft > 0 && donuts_in_me < 10)
+		var/donuts_to_make = rand(1,3)
+		for(var/i=0,i<donuts_to_make,i++)
+			if(donutsleft > 0)
+				new /obj/item/reagent_containers/food/snacks/donut(src)
+				donutsleft--
 
 /obj/structure/closet/crate/secure/hydroponics
 	desc = "A crate with a lock on it, painted in the scheme of the station's botanists."

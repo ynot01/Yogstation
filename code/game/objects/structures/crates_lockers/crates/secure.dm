@@ -69,12 +69,14 @@
 	var/turf/T = get_turf(src)
 	for(var/obj/item/reagent_containers/food/snacks/donut/D in T.GetAllContents())
 		donuts_in_me++
-	if(donutsleft > 0 && donuts_in_me < 10)
+	if(donutsleft > 0 && donuts_in_me < 10) // No more than 10 donuts on a tile
 		var/donuts_to_make = rand(1,3)
 		for(var/i=0,i<donuts_to_make,i++)
 			if(donutsleft > 0)
 				new /obj/item/reagent_containers/food/snacks/donut(src)
 				donutsleft--
+			else
+				break
 
 /obj/structure/closet/crate/secure/hydroponics
 	desc = "A crate with a lock on it, painted in the scheme of the station's botanists."

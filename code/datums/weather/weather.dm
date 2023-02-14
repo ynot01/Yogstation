@@ -60,7 +60,7 @@
 		if(protect_indoors && !A.outdoors)
 			continue
 		// space spans several z levels
-		if(istype(A, /area/space) || A.z in impacted_z_levels)
+		if(istype(A, /area/space) || (A.z in impacted_z_levels))
 			impacted_areas |= A
 	weather_duration = rand(weather_duration_lower, weather_duration_upper)
 	START_PROCESSING(SSweather, src)

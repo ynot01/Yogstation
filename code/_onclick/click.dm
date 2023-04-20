@@ -159,7 +159,6 @@
 		// Melee swing
 		if(!isgun(W) && a_intent == INTENT_HARM && iscarbon(usr))
 			var/obj/effect/swing/SW = new /obj/effect/swing( loc, src, params )
-			playsound(usr.loc, 'sound/weapons/punchmiss.ogg', 75, 1)
 			return
 
 		if(W)

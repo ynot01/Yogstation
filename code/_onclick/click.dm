@@ -158,7 +158,8 @@
 	else
 		// Melee swing
 		if(!isgun(W) && a_intent == INTENT_HARM && iscarbon(usr))
-			var/obj/effect/swing/SW = new /obj/effect/swing( loc, src, params )
+			new /obj/effect/swing( loc, src, params )
+			changeNext_move(CLICK_CD_MELEE)
 			return
 
 		if(W)

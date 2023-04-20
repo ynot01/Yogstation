@@ -52,6 +52,8 @@
 	see_in_dark = 7
 	can_be_held = TRUE
 	held_items = list(null, null)
+	ignores_capitalism = TRUE // Yogs -- Lets drones buy a damned smoke for christ's sake
+	var/pacifism = TRUE // Marks whether pacifism should be enabled for this drone type
 	var/staticChoice = "static"
 	var/list/staticChoices = list("static", "blank", "letter", "animal")
 	var/picked = FALSE //Have we picked our visual appearence (+ colour if applicable)
@@ -60,7 +62,7 @@
 	var/laws = {"\
 1. You may not involve yourself in the matters of another being, even if such matters conflict with Law Two or Law Three, unless the other being is another Drone.
 2. You may not harm any being, regardless of intent or circumstance.
-3. Your goals are to build, maintain, repair, improve, and provide power to the best of your abilities, You must never actively work against these goals.\
+3. Your goals are to build, maintain, repair, improve, and provide power to your assigned area to the best of your abilities. You must never actively work against these goals or leave your assigned area.\
 "}
 	var/heavy_emp_damage = 25 //Amount of damage sustained if hit by a heavy EMP pulse
 	var/alarms = list("Atmosphere" = list(), "Fire" = list(), "Power" = list())
@@ -79,6 +81,7 @@
 	"<span class='notify'>     - Interacting with non-living beings (dragging bodies, looting bodies, etc.)</span>\n"+\
 	"<span class='warning'>These rules are at admin discretion and will be heavily enforced.</span>\n"+\
 	span_warning("<u>If you do not have the regular drone laws, follow your laws to the best of your ability.</u>")
+	
 
 /mob/living/simple_animal/drone/get_status_tab_items()
 	. = ..()
@@ -108,6 +111,10 @@
 
 	for(var/datum/atom_hud/data/diagnostic/diag_hud in GLOB.huds)
 		diag_hud.add_to_hud(src)
+
+	if(pacifism)
+		ADD_TRAIT(src, TRAIT_PACIFISM, JOB_TRAIT)
+		ADD_TRAIT(src, TRAIT_NOGUNS, JOB_TRAIT) //love drones t. Altoids <3
 
 
 /mob/living/simple_animal/drone/med_hud_set_health()
@@ -175,7 +182,7 @@
 
 
 /mob/living/simple_animal/drone/examine(mob/user)
-	. = list("<span class='info'>*---------*\nThis is [icon2html(src, user)] \a <b>[src]</b>!")
+	. = list("<span class='info'>This is [icon2html(src, user)] \a <b>[src]</b>!")
 
 	//Hands
 	for(var/obj/item/I in held_items)
@@ -211,7 +218,7 @@
 			. += span_deadsay("A message repeatedly flashes on its display: \"REBOOT -- REQUIRED\".")
 		else
 			. += span_deadsay("A message repeatedly flashes on its display: \"ERROR -- OFFLINE\".")
-	. += "*---------*</span>"
+	. += "</span>"
 
 
 /mob/living/simple_animal/drone/assess_threat(judgement_criteria, lasercolor = "", datum/callback/weaponcheck=null) //Secbots won't hunt maintenance drones.

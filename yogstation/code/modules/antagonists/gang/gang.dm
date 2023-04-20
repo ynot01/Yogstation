@@ -7,6 +7,7 @@
 	var/hud_type = "gangster"
 	var/message_name = "Gangster"
 	var/datum/team/gang/gang
+	preview_outfit = /datum/outfit/gangster
 
 /datum/antagonist/gang/can_be_owned(datum/mind/new_owner)
 	. = ..()
@@ -31,7 +32,7 @@
 /datum/antagonist/gang/farewell()
 	if(ishuman(owner.current))
 		owner.current.visible_message("[span_deconversion_message("[owner.current] looks like [owner.current.p_theyve()] just remembered [owner.current.p_their()] real allegiance!")]", null, null, null, owner.current)
-		to_chat(owner, span_userdanger("You are no longer a gangster!"))
+		to_chat(owner, span_userdanger("You are no longer a gangster! Your memory is hazy from the time you were a gangster...the only thing you remember is the name of the one who brainwashed you..."))
 
 /datum/antagonist/gang/on_gain()
 	if(!gang)
@@ -473,6 +474,13 @@
 
 /datum/team/gang/proc/adjust_uniform_influence(value)
 	uniform_influence = max(0, uniform_influence + value)
+
+/datum/outfit/gangster
+	name = "Gangster (Preview only)"
+	mask = /obj/item/clothing/mask/cigarette/cigar/havana
+	uniform = /obj/item/clothing/under/rank/vice
+	neck = /obj/item/clothing/neck/necklace/dope
+	head = /obj/item/clothing/head/fedora
 
 /datum/team/gang/proc/count_members()
 	for(var/datum/mind/gangmind in members)

@@ -245,7 +245,7 @@
 		psi = min(psi + 1, psi_cap)
 		total_regen--
 		update_psi_hud()
-		sleep(0.5)
+		sleep(0.05 SECONDS)
 	psi_used_since_regen = 0
 	psi_regen_ticks = psi_regen_delay
 	psi_regenerating = FALSE
@@ -254,7 +254,7 @@
 /datum/antagonist/darkspawn/proc/update_psi_hud()
 	if(!owner.current || !owner.current.hud_used)
 		return
-	var/obj/screen/counter = owner.current.hud_used.psi_counter
+	var/atom/movable/screen/counter = owner.current.hud_used.psi_counter
 	counter.maptext = "<div align='center' valign='middle' style='position:relative; top:0px; left:6px'><font color='#7264FF'>[psi]</font></div>"
 
 /datum/antagonist/darkspawn/proc/regain_abilities()
@@ -291,8 +291,9 @@
 	var/datum/action/innate/darkspawn/D = abilities[id]
 	if(!silent)
 		to_chat(owner.current, span_velvet("You have lost the <b>[D.name]</b> ability."))
-	QDEL_NULL(abilities[id])
-	abilities -= abilities[id]
+	D.Remove(owner.current)
+	abilities -= D
+	QDEL_NULL(D)
 	return TRUE
 
 /datum/antagonist/darkspawn/proc/has_upgrade(id)
@@ -334,11 +335,9 @@
 	H.do_jitter_animation(1000)
 	var/processed_message = span_velvet("<b>\[Mindlink\] [H.real_name] has not divulged in time and is now forcefully divulging.</b>")
 	for(var/mob/M in GLOB.player_list)
-		if(M.stat == DEAD)
-			var/link = FOLLOW_LINK(M, H)
-			to_chat(M, "[link] [processed_message]")
-		else if(isdarkspawn(M))
+		if(M.stat != DEAD && isdarkspawn(M))
 			to_chat(M, processed_message)
+	deadchat_broadcast(processed_message, null, H)
 	addtimer(CALLBACK(src, .proc/divulge), 25)
 	addtimer(CALLBACK(/atom/.proc/visible_message, H, span_boldwarning("[H]'s skin sloughs off, revealing black flesh covered in symbols!"), \
 	span_userdanger("You have forcefully divulged!")), 25)
@@ -360,17 +359,20 @@
 
 /datum/antagonist/darkspawn/proc/sacrament()
 	var/mob/living/carbon/human/user = owner.current
-	var/mob/living/simple_animal/hostile/darkspawn_progenitor/progenitor = new(get_turf(user))
-	user.status_flags |= GODMODE
-	user.mind.transfer_to(progenitor)
-	progenitor.mind.AddSpell(new /obj/effect/proc_holder/spell/targeted/progenitor_curse(null))
 	if(!SSticker.mode.sacrament_done)
 		set_security_level(SEC_LEVEL_GAMMA)
 		addtimer(CALLBACK(src, .proc/sacrament_shuttle_call), 50)
 	for(var/V in abilities)
 		remove_ability(abilities[V], TRUE)
-	for(var/mob/M in GLOB.player_list)
-		M.playsound_local(M, 'yogstation/sound/magic/sacrament_complete.ogg', 70, FALSE, pressure_affected = FALSE)
+	for(var/datum/action/innate/darkspawn/leftover_ability in user.actions)
+		leftover_ability.Remove(user)
+		QDEL_NULL(leftover_ability)
+	// Spawn the cosmic progenitor
+	var/mob/living/simple_animal/hostile/darkspawn_progenitor/progenitor = new(get_turf(user))
+	user.status_flags |= GODMODE
+	user.mind.transfer_to(progenitor)
+	progenitor.mind.AddSpell(new /obj/effect/proc_holder/spell/targeted/progenitor_curse(null))
+	sound_to_playing_players('yogstation/sound/magic/sacrament_complete.ogg', 50, FALSE, pressure_affected = FALSE)
 	psi = 9999
 	psi_cap = 9999
 	psi_regen = 9999
@@ -437,6 +439,13 @@
 	data["upgrades"] = upgrades
 
 	return data
+
+/datum/antagonist/darkspawn/get_preview_icon()
+	var/icon/darkspawn_icon = icon('yogstation/icons/mob/darkspawn_progenitor.dmi', "darkspawn_progenitor")
+
+	darkspawn_icon.Scale(ANTAGONIST_PREVIEW_ICON_SIZE, ANTAGONIST_PREVIEW_ICON_SIZE)
+
+	return darkspawn_icon
 
 /datum/antagonist/darkspawn/ui_act(action, params)
 	if(..())

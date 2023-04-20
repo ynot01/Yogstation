@@ -27,6 +27,7 @@
 	key_third_person = "chokes"
 	message = "chokes!"
 	emote_type = EMOTE_AUDIBLE
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/cross
 	key = "cross"
@@ -44,7 +45,6 @@
 	key = "collapse"
 	key_third_person = "collapses"
 	message = "collapses!"
-	emote_type = EMOTE_AUDIBLE
 
 /datum/emote/living/collapse/run_emote(mob/user, params, type_override, intentional)
 	. = ..()
@@ -57,6 +57,7 @@
 	key_third_person = "coughs"
 	message = "coughs!"
 	emote_type = EMOTE_AUDIBLE
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/cough/can_run_emote(mob/user, status_check = TRUE , intentional)
 	. = ..()
@@ -78,6 +79,7 @@
 	message_alien = "lets out a waning guttural screech, green blood bubbling from its maw..."
 	message_larva = "lets out a sickly hiss of air and falls limply to the floor..."
 	message_monkey = "lets out a faint chimper as it collapses and stops moving..."
+	message_ipc = "gives one shrill beep before falling limp, their monitor flashing blue before completely shutting off..."
 	message_simple =  "stops moving..."
 	stat_allowed = UNCONSCIOUS
 	cooldown = 3.4 SECONDS
@@ -104,6 +106,7 @@
 	key = "faint"
 	key_third_person = "faints"
 	message = "faints."
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/faint/run_emote(mob/user, params, type_override, intentional)
 	. = ..()
@@ -153,6 +156,7 @@
 	key = "frown"
 	key_third_person = "frowns"
 	message = "frowns."
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/gag
 	key = "gag"
@@ -179,7 +183,6 @@
 	key_third_person = "glares"
 	message = "glares."
 	message_param = "glares at %t."
-	emote_type = EMOTE_AUDIBLE
 
 /datum/emote/living/grin
 	key = "grin"
@@ -191,11 +194,27 @@
 	key_third_person = "groans"
 	message = "groans!"
 	message_mime = "appears to groan!"
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/grimace
 	key = "grimace"
 	key_third_person = "grimaces"
 	message = "grimaces."
+
+/datum/emote/living/handsup
+	key = "handsup"
+	key_third_person = "raiseshands"
+	message	= span_surrender("raises their hands in the air, they surrender!")
+	restraint_check = TRUE
+
+/datum/emote/living/handsup/run_emote(mob/living/user, params, type_override, intentional)
+	. = ..()
+	if(!.)
+		return
+	for(var/obj/item/I in user.held_items)
+		user.drop_all_held_items(I, TRUE)
+	var/obj/item/twohanded/required/raisedhands/L = new(user)
+	user.put_in_hands(L)
 
 /datum/emote/living/jump
 	key = "jump"
@@ -208,7 +227,6 @@
 	key_third_person = "kisses"
 	message = "blows a kiss."
 	message_param = "blows a kiss to %t."
-	emote_type = EMOTE_AUDIBLE
 
 /datum/emote/living/laugh
 	key = "laugh"
@@ -216,6 +234,7 @@
 	message = "laughs."
 	message_mime = "laughs silently!"
 	emote_type = EMOTE_AUDIBLE
+	cooldown = 3 SECONDS
 	vary = TRUE
 
 /datum/emote/living/laugh/can_run_emote(mob/living/user, status_check = TRUE , intentional)
@@ -245,6 +264,7 @@
 	key_third_person = "nods"
 	message = "nods."
 	message_param = "nods at %t."
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/point
 	key = "point"
@@ -270,7 +290,7 @@
 	key = "pout"
 	key_third_person = "pouts"
 	message = "pouts."
-	emote_type = EMOTE_AUDIBLE
+	emote_type = EMOTE_VISIBLE
 
 /datum/emote/living/scream
 	key = "scream"
@@ -289,19 +309,17 @@
 	key = "scowl"
 	key_third_person = "scowls"
 	message = "scowls."
-	emote_type = EMOTE_AUDIBLE
 
 /datum/emote/living/shake
 	key = "shake"
 	key_third_person = "shakes"
 	message = "shakes their head."
-	emote_type = EMOTE_AUDIBLE
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/shiver
 	key = "shiver"
 	key_third_person = "shiver"
 	message = "shivers."
-	emote_type = EMOTE_AUDIBLE
 
 /datum/emote/living/sigh
 	key = "sigh"
@@ -350,7 +368,7 @@
 	message = "stares."
 	message_param = "stares at %t."
 
-/datum/emote/living/strech
+/datum/emote/living/stretch
 	key = "stretch"
 	key_third_person = "stretches"
 	message = "stretches their arms."
@@ -364,7 +382,6 @@
 	key = "surrender"
 	key_third_person = "surrenders"
 	message = span_surrender("puts their hands on their head and falls to the ground, they surrender!")
-	emote_type = EMOTE_AUDIBLE
 	mob_type_blacklist_typecache = list(/mob/living/simple_animal)
 
 /datum/emote/living/surrender/run_emote(mob/user, params, type_override, intentional)
@@ -382,6 +399,7 @@
 	key = "tremble"
 	key_third_person = "trembles"
 	message = "trembles in fear!"
+	stat_allowed = SOFT_CRIT
 
 /datum/emote/living/twitch
 	key = "twitch"
@@ -402,6 +420,8 @@
 	key_third_person = "whimpers"
 	message = "whimpers."
 	message_mime = "appears hurt."
+	stat_allowed = SOFT_CRIT
+	emote_type = EMOTE_AUDIBLE
 
 /datum/emote/living/wsmile
 	key = "wsmile"
@@ -450,13 +470,22 @@
 				if("Hearable")
 					emote_type = EMOTE_AUDIBLE
 				else
-					alert("Unable to use this emote, must be either hearable or visible.")
+					tgui_alert(usr,"Unable to use this emote, must be either hearable or visible.")
 					return
 			message = custom_emote
 	else
 		message = params
 		if(type_override)
 			emote_type = type_override
+	if(isnotpretty(message))
+		if(user.client.prefs.muted & MUTE_IC)
+			return
+		user.client.handle_spam_prevention("PRETTY FILTER", MUTE_ALL) // Constant message mutes someone faster for not pretty messages
+		to_chat(usr, span_notice("You fumble over your action. <a href='https://forums.yogstation.net/help/rules/#rule-0_1'>See rule 0.1</a>."))
+		var/log_message = "[key_name(usr)] just tripped a pretty filter: '[message]'."
+		message_admins(log_message)
+		log_emote(log_message)
+		return
 	. = ..()
 	message = null
 	emote_type = EMOTE_VISIBLE
@@ -499,6 +528,7 @@
 	message_param = "beeps at %t."
 	sound = 'sound/machines/twobeep.ogg'
 	mob_type_allowed_typecache = list(/mob/living/brain, /mob/living/silicon)
+	emote_type = EMOTE_AUDIBLE
 
 /datum/emote/living/circle
 	key = "circle"
@@ -528,3 +558,10 @@
 		to_chat(user, span_notice("You ready your slapping hand."))
 	else
 		to_chat(user, span_warning("You're incapable of slapping in your current state."))
+
+/datum/emote/living/thumbsup
+	key = "thumbsup"
+	key_third_person = "thumbs"
+	message = "gives a thumbs up."
+	message_param = "gives a thumbs up to %t."
+	restraint_check = TRUE

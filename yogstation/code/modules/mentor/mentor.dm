@@ -28,7 +28,7 @@ GLOBAL_PROTECT(mentor_href_token)
 		owner.mentor_datum = src
 		owner.add_mentor_verbs()
 		if(!check_rights_for(owner, R_ADMIN,0)) // don't add admins to mentor list.
-			GLOB.mentors += owner
+			GLOB.mentors |= owner
 	position = mentorposition
 
 /datum/mentors/proc/CheckMentorHREF(href, href_list)
@@ -104,7 +104,7 @@ GLOBAL_PROTECT(mentor_href_token)
 /proc/send_mentor_sound(client/C)
 	var/sound/pingsound = sound('yogstation/sound/misc/bikehorn_alert.ogg')
 	pingsound.volume = 90
-	if(GLOB.mentornoot || prob(10))
+	if((C.prefs.toggles & SOUND_ALT) && (GLOB.mentornoot || prob(10)))
 		pingsound = sound('sound/misc/nootnoot.ogg')
 		pingsound.volume = 100
 	pingsound.pan = 80

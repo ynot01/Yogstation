@@ -5,7 +5,7 @@
 	damage_type = OXY
 	nodamage = TRUE
 	armour_penetration = 100
-	flag = "magic"
+	flag = MAGIC
 	var/tile_dropoff = 0
 	var/tile_dropoff_s = 0
 
@@ -71,8 +71,9 @@
 		if(!stuff.anchored && stuff.loc && !isobserver(stuff))
 			if(do_teleport(stuff, stuff, 10, channel = TELEPORT_CHANNEL_MAGIC))
 				teleammount++
-				var/datum/effect_system/smoke_spread/smoke = new
-				smoke.set_up(max(round(4 - teleammount),0), stuff.loc) //Smoke drops off if a lot of stuff is moved for the sake of sanity
+				var/smoke_range = max(round(4 - teleammount), 0)
+				var/datum/effect_system/fluid_spread/smoke/smoke = new
+				smoke.set_up(smoke_range, location = stuff.loc) //Smoke drops off if a lot of stuff is moved for the sake of sanity
 				smoke.start()
 
 /obj/item/projectile/magic/safety
@@ -92,8 +93,8 @@
 
 	if(do_teleport(target, destination_turf, channel=TELEPORT_CHANNEL_MAGIC))
 		for(var/t in list(origin_turf, destination_turf))
-			var/datum/effect_system/smoke_spread/smoke = new
-			smoke.set_up(0, t)
+			var/datum/effect_system/fluid_spread/smoke/smoke = new
+			smoke.set_up(0, location = t)
 			smoke.start()
 
 /obj/item/projectile/magic/door
@@ -199,10 +200,14 @@
 		if("animal")
 			var/path = pick(/mob/living/simple_animal/hostile/carp,
 							/mob/living/simple_animal/hostile/bear,
-							/mob/living/simple_animal/hostile/mushroom,
+							/mob/living/simple_animal/hostile/carp/eyeball,
+							/mob/living/simple_animal/hostile/eldritch/raw_prophet,
 							/mob/living/simple_animal/hostile/statue,
 							/mob/living/simple_animal/hostile/retaliate/bat,
 							/mob/living/simple_animal/hostile/retaliate/goat,
+							/mob/living/simple_animal/hostile/retaliate/goat/clown,
+							/mob/living/simple_animal/hostile/retaliate/clown/mutant/blob,
+							/mob/living/simple_animal/hostile/retaliate/clown/clownhulk,
 							/mob/living/simple_animal/hostile/killertomato,
 							/mob/living/simple_animal/hostile/poison/giant_spider,
 							/mob/living/simple_animal/hostile/poison/giant_spider/hunter,
@@ -217,17 +222,18 @@
 							/mob/living/simple_animal/hostile/stickman/dog,
 							/mob/living/simple_animal/hostile/megafauna/dragon/lesser,
 							/mob/living/simple_animal/hostile/gorilla,
+							/mob/living/simple_animal/hostile/lightgeist/healing,
 							/mob/living/simple_animal/parrot,
 							/mob/living/simple_animal/pet/dog/corgi,
 							/mob/living/simple_animal/crab,
 							/mob/living/simple_animal/pet/dog/pug,
 							/mob/living/simple_animal/pet/cat,
-							/mob/living/simple_animal/mouse,
-							/mob/living/simple_animal/chicken,
+							/mob/living/simple_animal/pet/cat/space,
+							/mob/living/simple_animal/chocobo,
 							/mob/living/simple_animal/cow,
 							/mob/living/simple_animal/hostile/lizard,
 							/mob/living/simple_animal/pet/fox,
-							/mob/living/simple_animal/butterfly,
+							/mob/living/simple_animal/pet/catslug,
 							/mob/living/simple_animal/pet/cat/cak,
 							/mob/living/simple_animal/chick)
 			new_mob = new path(M.loc)
@@ -245,10 +251,8 @@
 				if(chooseable_races.len)
 					new_mob.set_species(pick(chooseable_races))
 
-			var/datum/preferences/A = new()	//Randomize appearance for the human
-			A.copy_to(new_mob, icon_updates=0)
-
 			var/mob/living/carbon/human/H = new_mob
+			H.randomize_human_appearance(~(RANDOMIZE_SPECIES))
 			H.update_body()
 			H.update_hair()
 			H.update_body_parts()
@@ -289,7 +293,7 @@
 	. = ..()
 	cheeseify(M, FALSE)
 
-/proc/cheeseify(mob/living/M, forced)
+/proc/cheeseify(mob/living/M, forced = FALSE)
 	if(!istype(M) || M.stat == DEAD || M.notransform || (GODMODE & M.status_flags))
 		return
 	if(istype(M, /mob/living/simple_animal/cheese))
@@ -298,6 +302,9 @@
 	var/mob/living/simple_animal/cheese/B = new(M.loc)
 	if(!B)
 		return
+	M.dropItemToGround(M.get_active_held_item())
+	M.dropItemToGround(M.get_inactive_held_item())
+	B.temporary = !forced
 	B.stored_mob = M
 	M.forceMove(B)	
 	M.log_message("became [B.real_name]", LOG_ATTACK, color="orange")
@@ -315,23 +322,7 @@
 		to_chat(B, poly_msg)
 	M.transfer_observers_to(B)
 	to_chat(B, "<span class='big bold'>You are a cheesewheel!</span><b> You're a harmless wheel of parmesan that is remarkably tasty. Careful of people that want to eat you.</b>")
-	if(!forced)
-		addtimer(CALLBACK(B, .proc/uncheeseify), 1 MINUTES)
 	return B
-
-/proc/uncheeseify(mob/living/simple_animal/cheese/cheese)
-	if(cheese.stored_mob)
-		var/mob/living/L = cheese.stored_mob
-		var/mob/living/simple_animal/cheese/C = cheese
-		L.forceMove(get_turf(C))
-		C.stored_mob = null
-		to_chat(L, "<span class='big bold'>You have fallen out of the cheese wheel!</b>")
-		if(L.mind)
-			C.mind.transfer_to(L)
-		else
-			L.key = C.key
-		C.transfer_observers_to(L)
-		C.death()
 
 /obj/item/projectile/magic/animate
 	name = "bolt of animation"
@@ -381,27 +372,43 @@
 /obj/item/projectile/magic/spellblade
 	name = "blade energy"
 	icon_state = "lavastaff"
-	damage = 15
+	damage = 20
 	damage_type = BURN
-	flag = "magic"
+	flag = MAGIC
 	dismemberment = 50
 	nodamage = FALSE
+
+/obj/item/projectile/magic/spellblade/weak
+	damage = 15
+	dismemberment = 20
+	
+/obj/item/projectile/magic/spellblade/beesword
+	name = "stinger"
+	icon_state = "bee"
+	damage = 1
+	damage_type = BRUTE
+	dismemberment = 0
+	
+/obj/item/projectile/magic/spellblade/beesword/on_hit(atom/target, blocked = FALSE)
+	..()
+	if(ishuman(target))
+		target.reagents.add_reagent(/datum/reagent/toxin/venom, 2)
 
 /obj/item/projectile/magic/arcane_barrage
 	name = "arcane bolt"
 	icon_state = "arcane_barrage"
-	damage = 20
+	damage = 40
 	damage_type = BURN
 	nodamage = FALSE
-	armour_penetration = 0
-	flag = "magic"
+	armour_penetration = 20
+	flag = MAGIC 
 	hitsound = 'sound/weapons/barragespellhit.ogg'
 
 /obj/item/projectile/magic/locker
 	name = "locker bolt"
 	icon_state = "locker"
 	nodamage = TRUE
-	flag = "magic"
+	flag = MAGIC
 	var/weld = TRUE
 	var/created = FALSE //prevents creation of more then one locker if it has multiple hits
 	var/locker_suck = TRUE
@@ -457,8 +464,8 @@
 		unmagify()
 
 /obj/structure/closet/decay/proc/decay()
-	animate(src, alpha = 0, time = 30)
-	addtimer(CALLBACK(GLOBAL_PROC, .proc/qdel, src), 30)
+	animate(src, alpha = 0, time = 3 SECONDS)
+	addtimer(CALLBACK(GLOBAL_PROC, .proc/qdel, src), 3 SECONDS)
 
 /obj/structure/closet/decay/open(mob/living/user)
 	. = ..()
@@ -612,11 +619,11 @@
 /obj/item/projectile/magic/aoe/lightning
 	name = "lightning bolt"
 	icon_state = "tesla_projectile"	//Better sprites are REALLY needed and appreciated!~
-	damage = 15
+	damage = 25
 	damage_type = BURN
 	nodamage = FALSE
 	speed = 0.3
-	flag = "magic"
+	flag = MAGIC
 
 	var/tesla_power = 20000
 	var/tesla_range = 15
@@ -682,14 +689,14 @@
 	nodamage = TRUE
 	armour_penetration = 100
 	temperature = 50
-	flag = "magic"
+	flag = MAGIC
 
 
 /obj/item/projectile/temp/runic_icycle
 	name = "Icicle"
 	icon_state = "runic_icycle"
 	damage = 6
-	flag = "magic"
+	flag = MAGIC
 	temperature = 80
 
 /obj/item/projectile/temp/runic_icycle/on_hit(target)
@@ -702,7 +709,7 @@
 	name = "Tentacle"
 	icon_state = "tentacle_end"
 	damage = 6
-	flag = "magic"
+	flag = MAGIC
 
 
 /obj/item/projectile/magic/runic_tentacle/on_hit(target)
@@ -719,7 +726,7 @@
 /obj/item/projectile/magic/runic_heal
 	name = "Runic Heal"
 	icon_state = "runic_heal"
-	flag = "magic"
+	flag = MAGIC
 	nodamage = TRUE
 /obj/item/projectile/magic/runic_heal/on_hit(target)
 	. = ..()
@@ -742,21 +749,21 @@
 /obj/item/projectile/magic/runic_fire
 	name = "Runic Fire"
 	icon_state = "lava"
-	flag = "magic"
+	flag = MAGIC
 	nodamage = FALSE
 
 /obj/item/projectile/magic/runic_fire/on_hit(target)
 	. = ..()
 	if(iscarbon(target))
 		var/mob/living/carbon/X = target
-		X.fire_stacks += 2
+		X.adjust_fire_stacks(2)
 		X.IgniteMob()
 
 
 /obj/item/projectile/magic/runic_honk
 	name = "Runic Peel"
 	icon_state = "runic_honk"
-	flag = "magic"
+	flag = MAGIC
 	range = 200
 	movement_type = FLYING
 	reflectable = REFLECT_NORMAL
@@ -773,7 +780,7 @@
 /obj/item/projectile/magic/runic_bomb
 	name = "Runic Bomb"
 	icon_state = "runic_bomb"
-	flag = "magic"
+	flag = MAGIC
 	range = 10
 	speed = 4
 	var/boom = 1
@@ -796,7 +803,7 @@
 /obj/item/projectile/magic/runic_toxin
 	name = "Runic Toxin"
 	icon_state = "syringeproj"
-	flag = "magic"
+	flag = MAGIC
 	damage = 1
 	damage_type = BRUTE
 	nodamage = FALSE
@@ -824,7 +831,7 @@
 /obj/item/projectile/magic/runic_death
 	name = "Runic Death"
 	icon_state = "antimagic"
-	flag = "magic"
+	flag = MAGIC
 	impact_effect_type = /obj/effect/temp_visual/dir_setting/bloodsplatter
 
 /obj/item/projectile/magic/runic_death/on_hit(mob/living/target)
@@ -837,13 +844,13 @@
 		target.adjustBruteLoss(40)
 
 
-/obj/item/projectile/magic/shotgun_slug
+/obj/item/projectile/magic/shotgun/slug
 	name = "Shotgun slug"
 	icon_state = "bullet"
 	damage = 10
-	flag = "magic"
+	flag = MAGIC
 
-/obj/item/projectile/magic/shotgun_slug/on_hit(target)
+/obj/item/projectile/magic/shotgun/slug/on_hit(target)
 	. = ..()
 	if(iscarbon(target))
 		var/mob/living/carbon/X = target
@@ -853,21 +860,21 @@
 	name = "Incendiary shotgun slug"
 	icon_state = "bullet"
 	damage = 5
-	flag = "magic"
+	flag = MAGIC
 
 
 /obj/item/projectile/magic/incediary_slug/on_hit(target)
 	. = ..()
 	if(iscarbon(target))
 		var/mob/living/carbon/X = target
-		X.fire_stacks += 1
+		X.adjust_fire_stacks(1)
 		X.IgniteMob()
 		X.adjustBruteLoss(5)
 
 /obj/item/projectile/magic/runic_mutation
 	name = "Runic Mutation"
 	icon_state = "toxin"
-	flag = "magic"
+	flag = MAGIC
 	irradiate = 12
 
 /obj/item/projectile/magic/runic_mutation/on_hit(target)
@@ -883,7 +890,7 @@
 
 /obj/item/projectile/magic/runic_resizement
 	name = "Runic Resizement"
-	flag = "magic"
+	flag = MAGIC
 	icon_state = "cursehand1"
 
 
@@ -899,7 +906,7 @@
 		var/reresize = pick(newsize1, newsize2, newsize3, newsize4, newsize5)
 		X.resize = reresize
 		X.update_transform()
-		sleep(100)
+		sleep(10 SECONDS)
 		if(reresize == 0.5)
 			reresize = 2
 			X.resize = reresize

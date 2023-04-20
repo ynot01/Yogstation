@@ -80,6 +80,7 @@
 #define SPAN_CLOWN "clown"
 #define SPAN_SINGING "singing"
 #define SPAN_CULTLARGE "cultlarge"
+#define SPAN_HELIUM "small"
 
 //bitflag #defines for return value of the radio() proc.
 #define ITALICS			(1<<0)
@@ -103,7 +104,7 @@
 #define MAX_MESSAGE_LEN			1024
 #define MAX_NAME_LEN			42
 #define MAX_BROADCAST_LEN		512
-#define MAX_CHARTER_LEN			80
+#define MAX_CHARTER_LEN			64
 
 // Audio/Visual Flags. Used to determine what sense are required to notice a message.
 #define MSG_VISUAL (1<<0)

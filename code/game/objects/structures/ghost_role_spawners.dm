@@ -31,7 +31,6 @@
 	return ..()
 
 //Ash walker eggs: Spawns in ash walker dens in lavaland. Ghosts become unbreathing lizards that worship the Necropolis and are advised to retrieve corpses to create more ash walkers.
-
 /obj/effect/mob_spawn/human/ash_walker
 	name = "ash walker egg"
 	desc = "A man-sized yellow egg, spawned from some unfathomable creature. A humanoid silhouette lurks within."
@@ -54,25 +53,76 @@
 /obj/effect/mob_spawn/human/ash_walker/special(mob/living/new_spawn)
 	new_spawn.fully_replace_character_name(null,random_unique_lizard_name(gender))
 	to_chat(new_spawn, "<b>Drag the corpses of men and beasts to your nest. It will absorb them to create more of your kind. Glory to the Necropolis!</b>") //yogs - removed a sentence
-
 	new_spawn.mind.add_antag_datum(/datum/antagonist/ashwalker, team)
-
-	if(ishuman(new_spawn))
-		var/mob/living/carbon/human/H = new_spawn
-		H.underwear = "Nude"
-		H.update_body()
 
 /obj/effect/mob_spawn/human/ash_walker/Initialize(mapload, datum/team/ashwalkers/ashteam)
 	. = ..()
 	var/area/A = get_area(src)
 	team = ashteam
 	if(A)
-		notify_ghosts("An ash walker egg is ready to hatch in \the [A.name].", source = src, action=NOTIFY_ATTACKORBIT, flashwindow = FALSE, ignore_key = POLL_IGNORE_ASHWALKER)
+		notify_ghosts("[mob_name] egg is ready to hatch in \the [A.name].", source = src, action=NOTIFY_ATTACKORBIT, flashwindow = FALSE, ignore_key = POLL_IGNORE_ASHWALKER)
+
+//Ash walker shaman eggs: Spawns in ash walker dens in lavaland. Only one can exist at a time, they are squishier than regular ashwalkers, and have the sole purpose of keeping other ashwalkers alive.
+/obj/effect/mob_spawn/human/ash_walker/shaman
+	name = "ash walker shaman egg"
+	desc = "A man-sized, amber egg spawned from some unfathomable creature. A humanoid silhouette lurks within."
+	mob_name = "an ash walker shaman"
+	mob_species = /datum/species/lizard/ashwalker/shaman
+	outfit = /datum/outfit/ashwalker/shaman //might be OP, but the flavour is there
+	short_desc = "You are an ash walker shaman. Your tribe worships the Necropolis."
+	flavour_text = "The wastes are sacred ground, its monsters a blessed bounty. You and your people have become one with the tendril and its land. \
+	You have seen lights in the distance and from the skies: outsiders that come with greed in their hearts. Fresh sacrifices for your nest."
+	assignedrole = "Ash Walker Shaman"
 
 /datum/outfit/ashwalker
-	name ="Ashwalker"
-	head = /obj/item/clothing/head/helmet/gladiator
-	uniform = /obj/item/clothing/under/gladiator/ash_walker
+	name = "Ashwalker"
+	uniform = /obj/item/clothing/under/chestwrap
+
+/datum/outfit/ashwalker/post_equip(mob/living/carbon/human/H, visualsOnly = FALSE)
+	H.underwear = "Nude"
+	H.update_body()
+
+/datum/outfit/ashwalker/tribesperson
+	name = "Ashwalker Tribesperson"
+	uniform = /obj/item/clothing/under/ash_robe
+
+/datum/outfit/ashwalker/hunter
+	name = "Ashwalker Hunter"
+	uniform = /obj/item/clothing/under/ash_robe/hunter
+	suit = /obj/item/clothing/suit/hooded/cloak/goliath/desert
+	back = /obj/item/gun/ballistic/bow/ashen
+	belt = /obj/item/storage/belt/quiver/ashwalker
+	shoes = /obj/item/clothing/shoes/xeno_wraps
+
+/datum/outfit/ashwalker/warrior
+	name = "Ashwalker Warrior"
+	uniform = /obj/item/clothing/under/tribal
+	head = /obj/item/clothing/head/helmet/skull
+	suit = /obj/item/clothing/suit/armor/bone/heavy
+	back = /obj/item/twohanded/bonespear
+	gloves = /obj/item/clothing/gloves/bracer
+	belt = /obj/item/storage/belt/mining/primitive
+	shoes = /obj/item/clothing/shoes/xeno_wraps
+	r_hand = /obj/item/shield/riot/goliath
+	l_hand = /obj/item/claymore/bone
+
+/datum/outfit/ashwalker/chief
+	name = "Ashwalker Chief"
+	uniform = /obj/item/clothing/under/ash_robe/chief
+	head = /obj/item/clothing/head/crown/resin
+	suit = /obj/item/clothing/suit/armor/bone
+	back = /obj/item/twohanded/bonespear/chitinspear
+	gloves = /obj/item/clothing/gloves/color/black/goliath
+	shoes = /obj/item/clothing/shoes/xeno_wraps/goliath
+	neck = /obj/item/clothing/neck/cloak/tribalmantle
+
+/datum/outfit/ashwalker/shaman
+	name = "Ashwalker Shaman"
+	uniform = /obj/item/clothing/under/ash_robe/shaman
+	head = /obj/item/clothing/head/shamanash
+	suit = /obj/item/clothing/suit/leather_mantle
+	belt = /obj/item/storage/bag/medpouch
+	gloves = /obj/item/clothing/gloves/color/black/goliath
 
 
 //Timeless prisons: Spawns in Wish Granter prisons in lavaland. Ghosts become age-old users of the Wish Granter and are advised to seek repentance for their past.
@@ -120,6 +170,7 @@
 	anchored = FALSE
 	move_resist = MOVE_FORCE_NORMAL
 	density = FALSE
+	banType = ROLE_GOLEM
 	var/has_owner = FALSE
 	var/can_transfer = TRUE //if golems can switch bodies to this new shell
 	var/mob/living/owner = null //golem's owner if it has one
@@ -138,8 +189,8 @@
 		notify_ghosts("\A [initial(species.prefix)] golem shell has been completed in \the [A.name].", source = src, action=NOTIFY_ATTACKORBIT, flashwindow = FALSE, ignore_key = POLL_IGNORE_GOLEM)
 	if(has_owner && creator)
 		short_desc = "You are a Golem."
-		flavour_text = "You move slowly, but are highly resistant to heat and cold as well as blunt trauma. You are unable to wear clothes, but can still use most tools. \
-		Serve [creator], and assist [creator.p_them()] in completing [creator.p_their()] goals at any cost."
+		flavour_text = "You move slowly and are unable to wear clothes, but can still use most tools. Depending on the material you were made of, you will have different strengths and weaknesses \
+		Serve [creator.real_name], and assist [creator.p_them()] in completing [creator.p_their()] goals at any cost."
 		owner = creator
 
 /obj/effect/mob_spawn/human/golem/special(mob/living/new_spawn, name)
@@ -175,7 +226,7 @@
 	if(.)
 		return
 	if(isgolem(user) && can_transfer)
-		var/transfer_choice = alert("Transfer your soul to [src]? (Warning, your old body will die!)",,"Yes","No")
+		var/transfer_choice = tgui_alert(usr, "Transfer your soul to [src]? (Warning, your old body will die!)",,list("Yes","No"))
 		if(transfer_choice != "Yes")
 			return
 		if(QDELETED(src) || uses <= 0)
@@ -597,6 +648,7 @@
 
 /obj/effect/mob_spawn/human/pirate/gunner
 	rank = "Gunner"
+	outfit = /datum/outfit/pirate/space/gunner
 
 //The Innkeeper, a iceplanet ghostrole for peacefully operating a rest stop complete with food and drinks.
 /obj/effect/mob_spawn/human/innkeeper

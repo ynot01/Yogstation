@@ -7,6 +7,9 @@
 */
 
 /mob/living/silicon/robot/ClickOn(var/atom/A, var/params)
+	if(HAS_TRAIT(src, TRAIT_NOINTERACT)) // INTERCEPTED
+		to_chat(src, span_danger("You can't interact with anything right now!"))
+		return
 	if(world.time <= next_click)
 		return
 	next_click = world.time + 1
@@ -14,7 +17,7 @@
 	if(check_click_intercept(params,A))
 		return
 
-	if(stat || lockcharge || IsParalyzed() || IsStun() || IsUnconscious())
+	if(stat || (lockcharge) || IsParalyzed() || IsStun() || IsUnconscious())
 		return
 
 	var/list/modifiers = params2list(params)

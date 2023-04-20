@@ -1,4 +1,4 @@
-/mob/living/carbon/Life()
+/mob/living/carbon/Life(seconds, times_fired)
 	set invisibility = 0
 
 	if(notransform)
@@ -8,7 +8,7 @@
 		damageoverlaytemp = 0
 		update_damage_hud()
 
-	if(!IS_IN_STASIS(src))
+	if(LIFETICK_SKIP(src, times_fired))
 
 		if(stat != DEAD) //Reagent processing needs to come before breathing, to prevent edge cases.
 			handle_organs()
@@ -17,6 +17,10 @@
 
 		if (QDELETED(src))
 			return
+
+		// yogs start -- typing indicators, look in yogstation specific folder for proc
+		handle_typing_indicator()
+		//yogs end
 
 		if(.) //not dead
 			handle_blood()
@@ -32,6 +36,10 @@
 
 		if(stat != DEAD)
 			handle_liver()
+
+		if(stat != DEAD)
+			//Stuff jammed in your limbs hurts
+			handle_embedded_objects()
 
 	else
 		. = ..()
@@ -54,16 +62,11 @@
 /mob/living/carbon/handle_breathing(times_fired)
 	var/next_breath = 4
 	var/obj/item/organ/lungs/L = getorganslot(ORGAN_SLOT_LUNGS)
-	var/obj/item/organ/heart/H = getorganslot(ORGAN_SLOT_HEART)
-	if(L)
-		if(L.damage > L.high_threshold)
-			next_breath--
-	if(H)
-		if(H.damage > H.high_threshold)
-			next_breath--
+	if(L?.damage)
+		next_breath = max(next_breath * L.get_organ_efficiency(), 1)
 
-	if((times_fired % next_breath) == 0 || failed_last_breath)
-		breathe() //Breathe per 4 ticks if healthy, down to 2 if our lungs or heart are damaged, unless suffocating
+	if((times_fired % next_breath) == 0 || failed_last_breath || isipc(src)) //IPCs breathe every tick to stabilize cooling
+		breathe() //Breathe per 4 ticks if healthy, down to 1 based on lung damage, unless suffocating
 		if(failed_last_breath)
 			SEND_SIGNAL(src, COMSIG_ADD_MOOD_EVENT, "suffocation", /datum/mood_event/suffocation)
 		else
@@ -153,7 +156,7 @@
 		adjustOxyLoss(1)
 
 		failed_last_breath = 1
-		throw_alert("not_enough_oxy", /obj/screen/alert/not_enough_oxy)
+		throw_alert("not_enough_oxy", /atom/movable/screen/alert/not_enough_oxy)
 		return 0
 
 	var/safe_oxy_min = 16
@@ -181,7 +184,7 @@
 		else
 			adjustOxyLoss(3)
 			failed_last_breath = 1
-		throw_alert("not_enough_oxy", /obj/screen/alert/not_enough_oxy)
+		throw_alert("not_enough_oxy", /atom/movable/screen/alert/not_enough_oxy)
 
 	else //Enough oxygen
 		failed_last_breath = 0
@@ -212,7 +215,7 @@
 	if(Toxins_partialpressure > safe_tox_max)
 		var/ratio = (breath.get_moles(/datum/gas/plasma)/safe_tox_max) * 10
 		adjustToxLoss(clamp(ratio, MIN_TOXIC_GAS_DAMAGE, MAX_TOXIC_GAS_DAMAGE))
-		throw_alert("too_much_tox", /obj/screen/alert/too_much_tox)
+		throw_alert("too_much_tox", /atom/movable/screen/alert/too_much_tox)
 	else
 		clear_alert("too_much_tox")
 
@@ -259,11 +262,6 @@
 		var/tritium_partialpressure = (breath.get_moles(/datum/gas/tritium)/breath.total_moles())*breath_pressure
 		radiation += tritium_partialpressure/10
 
-	//NITRYL
-	if(breath.get_moles(/datum/gas/nitryl))
-		var/nitryl_partialpressure = (breath.get_moles(/datum/gas/nitryl)/breath.total_moles())*breath_pressure
-		adjustFireLoss(nitryl_partialpressure/4)
-
 	//FREON
 	if(breath.get_moles(/datum/gas/freon))
 		var/freon_partialpressure = (breath.get_moles(/datum/gas/freon)/breath.total_moles())*breath_pressure
@@ -277,8 +275,6 @@
 			var/datum/disease/advance/miasma_disease = new /datum/disease/advance/random(2,3)
 			miasma_disease.name = "Unknown"
 			ForceContractDisease(miasma_disease, TRUE, TRUE)
-
-
 
 		//Miasma side effects
 		switch(miasma_partialpressure)
@@ -318,23 +314,24 @@
 
 	return 1
 
-//Fourth and final link in a breath chain
+/// Fourth and final link in a breath chain
 /mob/living/carbon/proc/handle_breath_temperature(datum/gas_mixture/breath)
 	return
 
 /mob/living/carbon/proc/get_breath_from_internal(volume_needed)
-	if(internal)
-		if(internal.loc != src)
-			internal = null
-			update_internals_hud_icon(0)
-		else if ((!wear_mask || !(wear_mask.clothing_flags & MASKINTERNALS)) && !getorganslot(ORGAN_SLOT_BREATHING_TUBE))
-			internal = null
-			update_internals_hud_icon(0)
-		else
-			update_internals_hud_icon(1)
-			. = internal.remove_air_volume(volume_needed)
-			if(!.)
-				return FALSE //to differentiate between no internals and active, but empty internals
+	if(invalid_internals())
+		// Unexpectely lost breathing apparatus and ability to breathe from the internal air tank.
+		cutoff_internals()
+		return
+	if (external)
+		. = external.remove_air_volume(volume_needed)
+	else if (internal)
+		. = internal.remove_air_volume(volume_needed)
+	else
+		// Return without taking a breath if there is no air tank.
+		return
+	// To differentiate between no internals and active, but empty internals.
+	return . || FALSE
 
 /mob/living/carbon/proc/handle_blood()
 	return
@@ -472,7 +469,7 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 					temp = amplitude * cos(saved_dizz * world.time)
 					pixel_y_diff += temp
 					C.pixel_y += temp
-					sleep(3)
+					sleep(0.3 SECONDS)
 					if(C)
 						temp = amplitude * sin(saved_dizz * world.time)
 						pixel_x_diff += temp
@@ -480,7 +477,7 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 						temp = amplitude * cos(saved_dizz * world.time)
 						pixel_y_diff += temp
 						C.pixel_y += temp
-					sleep(3)
+					sleep(0.3 SECONDS)
 					if(C)
 						C.pixel_x -= pixel_x_diff
 						C.pixel_y -= pixel_y_diff
@@ -528,7 +525,7 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 			if(prob(25))
 				slurring += 2
 			jitteriness = max(jitteriness - 3, 0)
-			throw_alert("drunk", /obj/screen/alert/drunk)
+			throw_alert("drunk", /atom/movable/screen/alert/drunk)
 			if(HAS_TRAIT(src, TRAIT_DRUNK_HEALING))
 				adjustBruteLoss(-0.12, FALSE)
 				adjustFireLoss(-0.06, FALSE)
@@ -602,6 +599,8 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 //used in human and monkey handle_environment()
 /mob/living/carbon/proc/natural_bodytemperature_stabilization()
 	var/body_temperature_difference = BODYTEMP_NORMAL - bodytemperature
+	if(HAS_TRAIT(src, TRAIT_COLDBLOODED)) // Return 0 as your natural temperature. Species proc handle_environment() will adjust your temperature based on this.
+		return 0
 	switch(bodytemperature)
 		if(-INFINITY to BODYTEMP_COLD_DAMAGE_LIMIT) //Cold damage limit is 50 below the default, the temperature where you start to feel effects.
 			return max((body_temperature_difference * metabolism_efficiency / BODYTEMP_AUTORECOVERY_DIVISOR), BODYTEMP_AUTORECOVERY_MINIMUM)
@@ -650,6 +649,35 @@ GLOBAL_LIST_INIT(ballmer_windows_me_msg, list("Yo man, what if, we like, uh, put
 	for(var/T in get_traumas())
 		var/datum/brain_trauma/BT = T
 		BT.on_life()
+
+
+////////////
+// EMBEDS //
+////////////
+
+/mob/living/carbon/proc/handle_embedded_objects()
+	for(var/X in bodyparts)
+		var/obj/item/bodypart/BP = X
+		for(var/obj/item/I in BP.embedded_objects)
+			I.embed_tick(src, BP)
+			var/pain_chance_current = I.embedding.embedded_pain_chance
+			if(!(mobility_flags & MOBILITY_STAND))
+				pain_chance_current *= 0.2
+			if(prob(pain_chance_current))
+				BP.receive_damage(I.w_class*I.embedding.embedded_pain_multiplier, wound_bonus = CANT_WOUND)
+				to_chat(src, span_userdanger("[I] embedded in your [BP.name] hurts!"))
+
+			var/fall_chance_current = I.embedding.embedded_fall_chance
+			if(!(mobility_flags & MOBILITY_STAND))
+				fall_chance_current *= 0.2
+
+			if(prob(fall_chance_current))
+				BP.receive_damage(I.w_class*I.embedding.embedded_fall_pain_multiplier, wound_bonus = CANT_WOUND) // can wound
+				remove_embedded_object(I, drop_location(), FALSE)
+				visible_message(span_danger("[I] falls out of [name]'s [BP.name]!"), span_userdanger("[I] falls out of your [BP.name]!"))
+				if(!has_embedded_objects())
+					clear_alert("embeddedobject")
+					SEND_SIGNAL(src, COMSIG_CLEAR_MOOD_EVENT, "embedded")
 
 /////////////////////////////////////
 //MONKEYS WITH TOO MUCH CHOLOESTROL//

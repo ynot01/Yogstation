@@ -26,7 +26,7 @@
 
 /obj/structure/closet/chefcloset
 	name = "\proper chef's closet"
-	desc = "It's a storage unit for foodservice garments and mouse traps."
+	desc = "It's a storage unit for food service garments and mouse traps."
 	icon_door = "black"
 
 /obj/structure/closet/chefcloset/PopulateContents()
@@ -53,7 +53,6 @@
 /obj/structure/closet/jcloset/PopulateContents()
 	..()
 	new /obj/item/clothing/under/rank/janitor(src)
-	new /obj/item/cartridge/janitor(src)
 	new /obj/item/clothing/gloves/color/black(src)
 	new /obj/item/clothing/head/soft/purple(src)
 	new /obj/item/paint/paint_remover(src)
@@ -310,7 +309,7 @@
 	new /obj/item/storage/backpack/satchel/explorer(src)
 
 /obj/structure/closet/wardrobe/tcomms
-	name = "signal tech wardrobe"
+	name = "network admin wardrobe"
 	icon = 'yogstation/icons/obj/closet.dmi'
 	icon_state = "sigtech"
 	icon_door = "sigtech"
@@ -322,6 +321,6 @@
 	new /obj/item/storage/backpack/industrial(src)
 	new /obj/item/storage/backpack/satchel/eng(src)
 	new /obj/item/clothing/suit/hooded/wintercoat/engineering/tcomms(src)
-	new /obj/item/clothing/under/yogs/rank/signal_tech(src)
+	new /obj/item/clothing/under/yogs/rank/network_admin(src)
 	new /obj/item/clothing/shoes/workboots(src)
-	new /obj/item/clothing/under/yogs/rank/signal_tech/skirt(src)
+	new /obj/item/clothing/under/yogs/rank/network_admin/skirt(src)

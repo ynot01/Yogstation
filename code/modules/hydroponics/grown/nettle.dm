@@ -11,7 +11,7 @@
 	growthstages = 5
 	genes = list(/datum/plant_gene/trait/repeated_harvest, /datum/plant_gene/trait/plant_type/weed_hardy)
 	mutatelist = list(/obj/item/seeds/nettle/death)
-	reagents_add = list(/datum/reagent/toxin/acid = 0.5)
+	reagents_add = list(/datum/reagent/toxin/acid = 0.1)
 
 /obj/item/seeds/nettle/death
 	name = "pack of death-nettle seeds"
@@ -25,18 +25,18 @@
 	yield = 2
 	genes = list(/datum/plant_gene/trait/repeated_harvest, /datum/plant_gene/trait/plant_type/weed_hardy, /datum/plant_gene/trait/stinging)
 	mutatelist = list()
-	reagents_add = list(/datum/reagent/toxin/acid/fluacid = 0.5, /datum/reagent/toxin/acid = 0.5)
+	reagents_add = list(/datum/reagent/toxin/acid/fluacid = 0.1, /datum/reagent/toxin/acid = 0.1)
 	rarity = 20
 
 /obj/item/reagent_containers/food/snacks/grown/nettle // "snack"
 	seed = /obj/item/seeds/nettle
 	name = "nettle"
 	desc = "It's probably <B>not</B> wise to touch it with bare hands..."
-	icon = 'icons/obj/items_and_weapons.dmi'
+	icon = 'icons/obj/hydroponics/equipment.dmi'
 	icon_state = "nettle"
 	lefthand_file = 'icons/mob/inhands/weapons/plants_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/weapons/plants_righthand.dmi'
-	damtype = "fire"
+	damtype = BURN
 	force = 15
 	wound_bonus = CANT_WOUND
 	hitsound = 'sound/weapons/bladeslice.ogg'
@@ -72,7 +72,10 @@
 	if(!proximity)
 		return
 	if(force > 0)
-		force -= rand(1, (force / 3) + 1) // When you whack someone with it, leaves fall off
+		if(istype(src, /obj/item/reagent_containers/food/snacks/grown/nettle/death)) // istype instead of new proc because . = ..() is scary
+			force -= rand(1, (force / 10) + 1) // rand of 1 to (10% + 1) as opposed to (33% + 1)
+		else
+			force -= rand(1, (force / 3) + 1) // When you whack someone with it, leaves fall off
 	else
 		to_chat(usr, "All the leaves have fallen off the nettle from violent whacking.")
 		qdel(src)
@@ -90,11 +93,11 @@
 	desc = "The <span class='danger'>glowing</span> nettle incites <span class='boldannounce'>rage</span> in you just from looking at it!"
 	icon_state = "deathnettle"
 	force = 30
-	throwforce = 15
+	throwforce = 10
 
 /obj/item/reagent_containers/food/snacks/grown/nettle/death/add_juice()
 	..()
-	force = round((5 + seed.potency / 2.5), 1)
+	force = round((5 + seed.potency / 4), 1) // Max 30 dmg, esword level, with max potency and buffed force reduction, should down unarmored in 3-4 hits
 
 /obj/item/reagent_containers/food/snacks/grown/nettle/death/pickup(mob/living/carbon/user)
 	if(..())

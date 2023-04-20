@@ -85,7 +85,7 @@
 	uniform = /obj/item/clothing/under/pirate
 	shoes = /obj/item/clothing/shoes/jackboots
 	glasses = /obj/item/clothing/glasses/eyepatch
-	head = /obj/item/clothing/head/bandana
+	head = /obj/item/clothing/head/pirate/bandana
 
 
 /obj/effect/mob_spawn/human/corpse/pirate/ranged
@@ -143,7 +143,7 @@
 /datum/outfit/russiancorpse/officer
 	name = "Russian Officer Corpse"
 	uniform = /obj/item/clothing/under/rank/security/navyblue/russian
-	suit = /obj/item/clothing/suit/security/officer/russian
+	suit = /obj/item/clothing/suit/armor/officerjacket/russian
 	shoes = /obj/item/clothing/shoes/combat
 	ears = /obj/item/radio/headset
 	head = /obj/item/clothing/head/ushanka

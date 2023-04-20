@@ -2,13 +2,14 @@
 	name = "Synth" //inherited from the real species, for health scanners and things
 	id = "synth"
 	say_mod = "beep boops" //inherited from a user's real species
-	sexes = 0
-	species_traits = list(NOTRANSSTING) //all of these + whatever we inherit from the real species
-	inherent_traits = list(TRAIT_VIRUSIMMUNE,TRAIT_NODISMEMBER,TRAIT_NOLIMBDISABLE,TRAIT_NOHUNGER,TRAIT_NOBREATH)
+	sexes = FALSE
+	species_traits = list(NO_DNA_COPY, NOTRANSSTING, AGENDER) //all of these + whatever we inherit from the real species
+	inherent_traits = list(TRAIT_VIRUSIMMUNE,TRAIT_RADIMMUNE,TRAIT_NODISMEMBER,TRAIT_NOLIMBDISABLE,TRAIT_NOHUNGER,TRAIT_NOBREATH)
 	inherent_biotypes = list(MOB_ROBOTIC, MOB_HUMANOID)
 	meat = null
 	damage_overlay_type = "synth"
 	limbs_id = "synth"
+	reagent_tag = PROCESS_SYNTHETIC //can now process chems that a robot would be able to process, because they're robots
 	var/disguise_fail_health = 75 //When their health gets to this level their synthflesh partially falls off
 	var/datum/species/fake_species //a species to do most of our work for us, unless we're damaged
 	var/list/initial_species_traits //for getting these values back for assume_disguise()
@@ -39,18 +40,6 @@
 /datum/species/synth/on_species_loss(mob/living/carbon/human/H)
 	. = ..()
 	UnregisterSignal(H, COMSIG_MOB_SAY)
-
-/datum/species/synth/handle_chemicals(datum/reagent/chem, mob/living/carbon/human/H)
-	H.reagents.remove_reagent(chem.type, chem.volume) //yogs start - synths don't process chems
-	return TRUE
-	/*
-	if(chem.type == /datum/reagent/medicine/synthflesh)
-		chem.reaction_mob(H, TOUCH, 2 ,0) //heal a little
-		H.reagents.remove_reagent(chem.type, REAGENTS_METABOLISM)
-		return 1
-	else
-		return ..()
-	*/ //yogs end
 
 /datum/species/synth/proc/assume_disguise(datum/species/S, mob/living/carbon/human/H)
 	if(S && !istype(S, type))
@@ -92,7 +81,7 @@
 		meat = initial(meat)
 		limbs_id = "synth"
 		use_skintones = 0
-		sexes = 0
+		sexes = FALSE
 		fixed_mut_color = ""
 		hair_color = ""
 
@@ -134,3 +123,21 @@
 					speech_args[SPEECH_SPANS] |= SPAN_CLOWN
 				if (/datum/species/golem/clockwork)
 					speech_args[SPEECH_SPANS] |= SPAN_ROBOT
+
+/datum/species/synth/handle_chemicals(datum/reagent/chem, mob/living/carbon/human/H)
+	. = ..()
+
+	if(H.reagents.has_reagent(/datum/reagent/teslium,10)) //10 u otherwise it wont update and they will remain quikk
+		H.add_movespeed_modifier("preternis_teslium", update=TRUE, priority=101, multiplicative_slowdown=-2, blacklisted_movetypes=(FLYING|FLOATING))
+		if(H.health < 50 && H.health > 0)
+			H.adjustOxyLoss(-1*REAGENTS_EFFECT_MULTIPLIER)
+			H.adjustBruteLoss(-1*REAGENTS_EFFECT_MULTIPLIER,FALSE,FALSE, BODYPART_ANY)
+			H.adjustFireLoss(-1*REAGENTS_EFFECT_MULTIPLIER,FALSE,FALSE, BODYPART_ANY)
+		H.AdjustParalyzed(-3)
+		H.AdjustStun(-3)
+		H.AdjustKnockdown(-3)
+		H.adjustStaminaLoss(-5*REAGENTS_EFFECT_MULTIPLIER)
+		burnmod = 200
+	else
+		H.remove_movespeed_modifier("preternis_teslium")
+		burnmod = initial(burnmod)

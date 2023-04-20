@@ -2,16 +2,22 @@
 	var/obj/item/ai_hijack_device/hijacking
 	var/mutable_appearance/hijack_overlay
 	var/hijack_start = 0
+	var/cog_start = 0
+	var/obj/item/clockwork/integration_cog/cogging
 
 /mob/living/silicon/ai/proc/set_core_display_icon_yogs(input)
 	var/datum/ai_skin/S = input
-	icon = S.icon
-	icon_state = S.icon_state
+
+	for (var/each in GLOB.ai_core_displays) //change status of displays
+		var/obj/machinery/status_display/ai_core/M = each
+		M.set_ai(S.icon_state, S.icon)
+		M.update()
+
 
 /mob/living/silicon/ai/attack_hand(mob/user)
 	if(hijacking)
 		user.visible_message(span_danger("[user] attempts to disconnect the circuit board from [src]"), span_notice("There appears to be something connected to [src]'s ports! You attempt to disconnect it..."))
-		if (do_after(user,100,target = src))
+		if (do_after(user, 10 SECONDS, src))
 			hijacking.forceMove(loc)
 			hijacking = null
 			hijack_start = 0
@@ -44,3 +50,8 @@
 		hijacking = null
 		hijack_start = 0
 		to_chat(src, span_bolddanger("Unknown device disconnected. Systems confirmed secure."))
+
+/mob/living/silicon/ai/proc/changeaccent()
+	set category = "AI Commands"
+	set name = "Change Accent"
+	return accentchange()

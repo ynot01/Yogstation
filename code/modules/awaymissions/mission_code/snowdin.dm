@@ -194,7 +194,7 @@
 			var/mob/living/L = thing
 			if(L.movement_type & FLYING)
 				continue	//YOU'RE FLYING OVER IT
-			if("snow" in L.weather_immunities)
+			if(WEATHER_SNOW in L.weather_immunities)
 				continue
 
 			var/buckle_check = L.buckling
@@ -207,7 +207,7 @@
 
 			else if(isliving(buckle_check))
 				var/mob/living/live = buckle_check
-				if("snow" in live.weather_immunities)
+				if(WEATHER_SNOW in live.weather_immunities)
 					continue
 
 			L.adjustFireLoss(2)
@@ -503,7 +503,7 @@
 				/obj/item/storage/backpack/holding = 12,
 				/obj/item/grenade/spawnergrenade/manhacks = 6,
 				/obj/item/grenade/spawnergrenade/spesscarp = 7,
-				/obj/item/grenade/clusterbuster/inferno = 3,
+				/obj/item/grenade/clusterbuster/syndie/inferno = 3,
 				/obj/item/stack/sheet/mineral/diamond{amount = 15} = 10,
 				/obj/item/stack/sheet/mineral/uranium{amount = 15} = 10,
 				/obj/item/stack/sheet/mineral/plasma{amount = 15} = 10,
@@ -527,7 +527,7 @@
 				/obj/item/gun/magic/wand/resurrection = 10,
 				/obj/item/uplink/old = 2,
 				/obj/item/book/granter/spell/charge = 12,
-				/obj/item/grenade/clusterbuster/spawner_manhacks = 15,
+				/obj/item/grenade/clusterbuster/syndie/spawner_manhacks = 15,
 				/obj/item/book/granter/spell/fireball = 10,
 				/obj/item/pickaxe/drill/jackhammer = 30,
 				/obj/item/borg/upgrade/syndicate = 13,
@@ -555,7 +555,7 @@
 /obj/item/clothing/under/syndicate/coldres
 	name = "insulated tactical turtleneck"
 	desc = "A nondescript and slightly suspicious-looking turtleneck with digital camouflage cargo pants. The interior has been padded with special insulation for both warmth and protection."
-	armor = list("melee" = 20, "bullet" = 10, "laser" = 0,"energy" = 5, "bomb" = 0, "bio" = 0, "rad" = 0, "fire" = 25, "acid" = 25)
+	armor = list(MELEE = 20, BULLET = 10, LASER = 0,ENERGY = 5, BOMB = 0, BIO = 0, RAD = 0, FIRE = 25, ACID = 25)
 	cold_protection = CHEST|GROIN|ARMS|LEGS
 	min_cold_protection_temperature = FIRE_SUIT_MIN_TEMP_PROTECT
 

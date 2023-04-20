@@ -160,20 +160,20 @@
 			new /obj/item/ammo_box/c10mm(src)
 			new /obj/item/ammo_box/c45(src)
 			new /obj/item/clothing/suit/armor/vest(src)
-			new /obj/item/reagent_containers/hypospray/mixi(src)
+			new /obj/item/reagent_containers/autoinjector/mixi(src)
 			new /obj/item/storage/firstaid(src)
 			new /obj/item/shield/riot(src)
 			return
 		else if(prob(25))
 			new /obj/item/ammo_box/a40mm(src)
 			new /obj/item/ammo_box/a762(src)
-			new /obj/item/reagent_containers/hypospray/mixi(src)
-			new /obj/item/reagent_containers/hypospray/derm(src)
+			new /obj/item/reagent_containers/autoinjector/mixi(src)
+			new /obj/item/reagent_containers/autoinjector/derm(src)
 			new /obj/item/storage/firstaid/fire(src)
 			new /obj/item/clothing/suit/armor/riot(src)
 			return
 		else if(prob(10))
-			new /obj/item/ammo_box/n762(src)
+			new /obj/item/ammo_box/no_direct/n762(src)
 			new /obj/item/ammo_box/foambox/riot
 			new /obj/item/clothing/suit/space/hardsuit/ert/sec(src)
 			new /obj/item/storage/firstaid(src)
@@ -187,7 +187,7 @@
 			new /obj/item/ammo_box/c45(src)
 			new /obj/item/ammo_box/a40mm(src)
 			new /obj/item/ammo_box/a762(src)
-			new /obj/item/ammo_box/n762(src)
+			new /obj/item/ammo_box/no_direct/n762(src)
 			new /obj/item/ammo_box/foambox/riot
 			new /obj/item/clothing/suit/space/hardsuit/syndi(src)
 			new /obj/item/storage/firstaid(src)

@@ -1,9 +1,9 @@
 #define MAX_RANGE_FIND 32
 
 /mob/living/carbon/monkey
-	var/aggressive=0 // set to 1 using VV for an angry monkey
-	var/frustration=0
-	var/pickupTimer=0
+	var/aggressive = FALSE // set to TRUE using VV for an angry monkey
+	var/frustration = 0
+	var/pickupTimer = 0
 	var/list/enemies = list()
 	var/mob/living/target
 	var/obj/item/pickupTarget
@@ -18,7 +18,7 @@
 	var/disposing_body = FALSE
 	var/obj/machinery/disposal/bodyDisposal = null
 	var/next_battle_screech = 0
-	var/battle_screech_cooldown = 50
+	var/battle_screech_cooldown = 5 SECONDS
 
 /mob/living/carbon/monkey/proc/IsStandingStill()
 	return resisting || pickpocketing || disposing_body
@@ -43,7 +43,7 @@
 
 	// failed to path correctly so just try to head straight for a bit
 	walk_to(src,get_turf(target),0,5)
-	sleep(1)
+	sleep(0.1 SECONDS)
 	walk_to(src,0)
 
 	return 0
@@ -103,7 +103,7 @@
 /mob/living/carbon/monkey/proc/pickup_and_wear(var/obj/item/clothing/C)
 	if(!equip_to_appropriate_slot(C))
 		monkeyDrop(get_item_by_slot(C)) // remove the existing item if worn
-		sleep(5)
+		sleep(0.5 SECONDS)
 		equip_to_appropriate_slot(C)
 
 /mob/living/carbon/monkey/resist_restraints()
@@ -152,7 +152,8 @@
 						var/mob/M = pickupTarget.loc
 						if(!pickpocketing)
 							pickpocketing = TRUE
-							M.visible_message("[src] starts trying to take [pickupTarget] from [M]!", "[src] tries to take [pickupTarget]!")
+							if(!istype(pickupTarget, /obj/item/clothing/mob_holder)) // don't say anything if we try to steal ourselves (it gets blocked in the proc itself)
+								M.visible_message("[src] starts trying to take [pickupTarget] from [M]!", "[src] tries to take [pickupTarget]!")
 							INVOKE_ASYNC(src, .proc/pickpocket, M)
 			return TRUE
 
@@ -304,9 +305,11 @@
 
 	return IsStandingStill()
 
-/mob/living/carbon/monkey/proc/pickpocket(var/mob/M)
+/mob/living/carbon/monkey/proc/pickpocket(mob/M)
 	if(do_mob(src, M, MONKEY_ITEM_SNATCH_DELAY) && pickupTarget)
 		for(var/obj/item/I in M.held_items)
+			if(istype(I, /obj/item/clothing/mob_holder)) //prevents monkeys from stealing themselves (temporalily deletes them if they do)
+				continue
 			if(I == pickupTarget)
 				M.visible_message(span_danger("[src] snatches [pickupTarget] from [M]."), span_userdanger("[src] snatched [pickupTarget]!"))
 				if(M.temporarilyRemoveItemFromInventory(pickupTarget))

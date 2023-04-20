@@ -130,8 +130,9 @@
 	throw_speed = 3
 	throw_range = 5
 	materials = list(MAT_METAL=10000)
-	armor = list("melee" = 0, "bullet" = 0, "laser" = 0, "energy" = 0, "bomb" = 30, "bio" = 0, "rad" = 0, "fire" = 100, "acid" = 100)
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0, ENERGY = 0, BOMB = 30, BIO = 0, RAD = 0, FIRE = 100, ACID = 100)
 	resistance_flags = INDESTRUCTIBLE | LAVA_PROOF | FIRE_PROOF | ACID_PROOF
+	cryo_preserve = TRUE
 	var/list/active_portal_pairs
 	var/max_portal_pairs = 3
 	var/atmos_link_override
@@ -147,9 +148,11 @@
 
 /obj/item/hand_tele/proc/try_dispel_portal(atom/target, mob/user)
 	if(is_parent_of_portal(target))
-		qdel(target)
-		to_chat(user, span_notice("You dispel [target] with \the [src]!"))
-		return TRUE
+		balloon_alert(user, "Dispelling portal...")
+		if(do_after(user, 4 SECONDS, target))
+			qdel(target)
+			to_chat(user, span_notice("You dispel [target] with \the [src]!"))
+			return TRUE
 	return FALSE
 
 /obj/item/hand_tele/afterattack(atom/target, mob/user)

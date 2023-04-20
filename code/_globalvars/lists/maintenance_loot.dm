@@ -24,6 +24,12 @@
 //maintcentral:			2  items,  2 spots 0 extra (08/08/2014)
 //port:					5  items,  5 spots 0 extra (08/08/2014)
 
+
+//************************************************************
+// AS OF ROUGHLY 2023/03/20, THIS FILE IS REDUNDANT
+// MAINT LOOT IS NOW HANDELED AT
+// yogstation/code/_globalvars/lists/maintenance_loot.dm
+//************************************************************
 GLOBAL_LIST_INIT(maintenance_loot, list(
 	/obj/item/bodybag = 1,
 	/obj/item/clothing/glasses/meson = 2,
@@ -49,6 +55,7 @@ GLOBAL_LIST_INIT(maintenance_loot, list(
 	/obj/item/airlock_painter = 1,
 	/obj/item/stack/cable_coil/random = 4,
 	/obj/item/stack/cable_coil/random/five = 6,
+	/obj/item/stack/tape = 1,
 	/obj/item/stack/medical/suture = 1,
 	/obj/item/stack/rods/ten = 9,
 	/obj/item/stack/rods/twentyfive = 1,
@@ -69,7 +76,7 @@ GLOBAL_LIST_INIT(maintenance_loot, list(
 	/obj/item/extinguisher = 11,
 	/obj/item/hand_labeler = 1,
 	/obj/item/paper/crumpled = 1,
-	/obj/item/reagent_containers/hypospray/medipen/pumpup = 6,
+	/obj/item/reagent_containers/autoinjector/medipen/pumpup = 6,
 	/obj/item/pen = 1,
 	/obj/item/reagent_containers/spray/pestspray = 1,
 	/obj/item/reagent_containers/glass/rag = 3,
@@ -78,6 +85,11 @@ GLOBAL_LIST_INIT(maintenance_loot, list(
 	/obj/item/storage/box = 2,
 	/obj/item/storage/box/cups = 1,
 	/obj/item/storage/box/donkpockets = 1,
+	/obj/item/storage/box/donkpockets/donkpocketspicy = 1,
+	/obj/item/storage/box/donkpockets/donkpocketteriyaki = 1,
+	/obj/item/storage/box/donkpockets/donkpocketpizza = 1,
+	/obj/item/storage/box/donkpockets/donkpocketberry = 1,
+	/obj/item/storage/box/donkpockets/donkpockethonk = 1,
 	/obj/item/storage/box/lights/mixed = 3,
 	/obj/item/storage/box/hug/medical = 1,
 	/obj/item/storage/box/fancy/cigarettes/dromedaryco = 1,
@@ -106,6 +118,7 @@ GLOBAL_LIST_INIT(maintenance_loot, list(
 	/obj/item/storage/toolbox/artistic = 2,
 	/obj/item/toy/eightball = 1,
 	/obj/item/reagent_containers/pill/floorpill = 1,
+	/obj/item/reagent_containers/gummy/floorbear = 1,
 	/obj/item/reagent_containers/food/snacks/cannedpeaches/maint = 1,
 	/obj/item/storage/box/mre/menu3 = 1, //Yogs start - MREs
 	/obj/item/storage/box/mre/menu2 = 2,
@@ -113,3 +126,21 @@ GLOBAL_LIST_INIT(maintenance_loot, list(
 	/obj/item/storage/box/mre = 3, //Yogs end
 	"" = 3
 	))
+
+
+
+GLOBAL_LIST_INIT(ratking_trash, list(//Garbage: used by the regal rat mob when spawning garbage.
+			/obj/item/cigbutt,
+			/obj/item/trash/cheesie,
+			/obj/item/trash/candy,
+			/obj/item/trash/chips,
+			/obj/item/trash/pistachios,
+			/obj/item/trash/plate,
+			/obj/item/trash/popcorn,
+			/obj/item/trash/raisins,
+			/obj/item/trash/sosjerky,
+			/obj/item/trash/syndi_cakes))
+
+GLOBAL_LIST_INIT(ratking_coins, list(//Coins: Used by the regal rat mob when spawning coins.
+			/obj/item/coin/iron,
+			/obj/item/coin/silver,))

@@ -2,11 +2,16 @@
 
 #define in_range(source, user) (get_dist(source, user) <= 1 && (get_step(source, 0)?:z) == (get_step(user, 0)?:z))
 
+/// Within given range, but not counting z-levels
+#define IN_GIVEN_RANGE(source, other, given_range) (get_dist(source, other) <= given_range && (get_step(source, 0)?:z) == (get_step(other, 0)?:z))
+
 #define isatom(A) (isloc(A))
 
 #define isweakref(D) (istype(D, /datum/weakref))
 
-#define isappearance(A) (copytext("\ref[A]", 4, 6) == "3a")
+#define isdatum(thing) (istype(thing, /datum))
+
+#define isappearance(A) (!isnum(A) && copytext("\ref[A]", 4, 6) == "3a")
 
 #define isnan(x) ( isnum((x)) && ((x) != (x)) )
 
@@ -44,6 +49,10 @@ GLOBAL_LIST_INIT(turfs_without_ground, typecacheof(list(
 
 #define isplatingturf(A) (istype(A, /turf/open/floor/plating))
 
+#define isaicore(A) (istype(A, /obj/machinery/ai/data_core))
+
+#define isvalidAIloc(A) ((isturf(A) || isaicore(A)))
+
 //Mobs
 #define isliving(A) (istype(A, /mob/living))
 
@@ -75,6 +84,11 @@ GLOBAL_LIST_INIT(turfs_without_ground, typecacheof(list(
 #define isethereal(A) (is_species(A, /datum/species/ethereal))
 #define isvampire(A) (is_species(A,/datum/species/vampire))
 #define ispreternis(A) (is_species(A,/datum/species/preternis))
+#define isszlachta(A) (is_species(A, /datum/species/szlachta))
+#define isipc(A) (is_species(A, /datum/species/ipc))
+#define issnail(A) (is_species(A, /datum/species/snail))
+#define isandroid(A) (is_species(A, /datum/species/android))
+#define isdummy(A) (istype(A, /mob/living/carbon/human/dummy))
 
 //more carbon mobs
 #define ismonkey(A) (istype(A, /mob/living/carbon/monkey))
@@ -113,6 +127,8 @@ GLOBAL_LIST_INIT(turfs_without_ground, typecacheof(list(
 
 #define isrevenant(A) (istype(A, /mob/living/simple_animal/revenant))
 
+#define ishorror(A) (istype(A, /mob/living/simple_animal/horror))
+
 #define isbot(A) (istype(A, /mob/living/simple_animal/bot))
 
 #define isshade(A) (istype(A, /mob/living/simple_animal/shade))
@@ -142,6 +158,8 @@ GLOBAL_LIST_INIT(turfs_without_ground, typecacheof(list(
 #define ismegafauna(A) (istype(A, /mob/living/simple_animal/hostile/megafauna))
 
 #define isclown(A) (istype(A, /mob/living/simple_animal/hostile/retaliate/clown))
+
+#define issupplypod(A) (istype(A, /obj/structure/closet/supplypod))
 
 GLOBAL_LIST_INIT(shoefootmob, typecacheof(list(
 	/mob/living/carbon/human/,

@@ -14,7 +14,7 @@
 	var/productivity = 0
 	var/max_items = 40
 	var/datum/techweb/stored_research
-	var/list/show_categories = list("Food", "Botany Chemicals", "Organic Materials")
+	var/list/show_categories = list("Food","Kitchen Chemicals","Botany Chemicals","Organic Materials")
 	/// Currently selected category in the UI
 	var/selected_cat
 
@@ -146,7 +146,7 @@
 			span_hear("You hear the chatter of a floppy drive."))
 		processing = TRUE
 		var/obj/item/disk/design_disk/D = O
-		if(do_after(user, 1 SECONDS, target = src))
+		if(do_after(user, 1 SECONDS, src))
 			for(var/B in D.blueprints)
 				if(B)
 					stored_research.add_design(B)
@@ -214,7 +214,7 @@
 	return TRUE
 
 /obj/machinery/biogenerator/proc/create_product(datum/design/D, amount)
-	if(!beaker || !loc)
+	if(!loc)
 		return FALSE
 
 	if(ispath(D.build_path, /obj/item/stack))
@@ -296,15 +296,20 @@
 		var/list/cat = list(
 			"name" = category,
 			"items" = (category == selected_cat ? list() : null))
+		var/needs_chem //Buffer because I am stupid
 		for(var/item in categories[category])
 			var/datum/design/D = item
+			if(!D.make_reagents)
+				needs_chem = FALSE
+			else
+				needs_chem = TRUE
 			cat["items"] += list(list(
 				"id" = D.id,
 				"name" = D.name,
 				"cost" = D.materials[getmaterialref(/datum/material/biomass)]/efficiency,
+				"chem" = needs_chem,
 			))
 		data["categories"] += list(cat)
-
 	return data
 
 /obj/machinery/biogenerator/ui_act(action, list/params)

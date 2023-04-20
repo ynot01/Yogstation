@@ -29,9 +29,10 @@
 		/obj/effect/proc_holder/spell/pointed/hypno = 0,
 		/datum/vampire_passive/vision = 75,
 		/obj/effect/proc_holder/spell/self/shapeshift = 75,
+		/datum/vampire_passive/nostealth = 100,
 		/obj/effect/proc_holder/spell/self/cloak = 100,
 		/obj/effect/proc_holder/spell/self/revive = 100,
-		/obj/effect/proc_holder/spell/targeted/disease = 200,//why is spell-that-kills-people unlocked so early what the fuck
+		/obj/effect/proc_holder/spell/targeted/disease = 200,
 		/obj/effect/proc_holder/spell/self/batform = 200,
 		/obj/effect/proc_holder/spell/self/screech = 215,
 		/obj/effect/proc_holder/spell/bats = 250,
@@ -55,8 +56,8 @@
 	usable_blood = ALL_POWERS_UNLOCKED
 	total_blood = ALL_POWERS_UNLOCKED
 	check_vampire_upgrade()
-	message_admins("[key_name_admin(admin)] made [owner.current] a full power vampire..")
-	log_admin("[key_name(admin)] made [owner.current] a full power vampire..")
+	message_admins("[key_name_admin(admin)] made [owner.current] a full-power vampire.")
+	log_admin("[key_name(admin)] made [owner.current] a full-power vampire.")
 
 /datum/antagonist/vampire/proc/admin_set_blood(mob/admin)
 	total_blood = input(admin, "Set Vampire Total Blood", "Total Blood", total_blood) as null|num
@@ -107,14 +108,17 @@
 /datum/antagonist/vampire/greet()
 	to_chat(owner, span_userdanger("You are a Vampire!"))
 	to_chat(owner, "<span class='danger bold'>You are a creature of the night -- holy water, the chapel, and space will cause you to burn.</span>")
-	to_chat(owner, span_userdanger("Hit someone in the head with harm intent to start sucking their blood. However, only blood from living, non-vampiric creatures is usable!"))
+	to_chat(owner, span_userdanger("Hit someone in the head with harm intent and an open hand to start sucking their blood. However, only blood from living, non-vampiric creatures is usable!"))
 	to_chat(owner, "<span class='notice bold'>Coffins will heal you.</span>")
 	if(full_vampire == FALSE)
 		to_chat(owner, "<span class='notice bold'>You are not required to obey other vampires, however, you have gained a respect for them.</span>")
 	if(LAZYLEN(objectives_given))
 		owner.announce_objectives()
 	if(full_vampire == FALSE)
-		owner.current.playsound_local(get_turf(owner.current), 'yogstation/sound/ambience/antag/lilithspact.ogg',80,0)
+		if(prob(10))
+			owner.current.playsound_local(get_turf(owner.current), 'yogstation/sound/ambience/antag/lilithspact_alt.ogg',80,0)
+		else
+			owner.current.playsound_local(get_turf(owner.current), 'yogstation/sound/ambience/antag/lilithspact.ogg',80,0)
 	else
 		if(prob(10))
 			owner.current.playsound_local(get_turf(owner.current), 'yogstation/sound/ambience/antag/newvampire_alt.ogg',80,0)
@@ -250,7 +254,7 @@
 	var/warned = FALSE //has the vampire been warned they're about to alert a target while stealth sucking?
 	var/blood_to_take = BLOOD_SUCK_BASE //how much blood should be removed per succ? changes depending on grab state
 	log_attack("[O] ([O.ckey]) bit [H] ([H.ckey]) in the neck")
-	if(!(O.pulling == H))
+	if(!(O.pulling == H) && !get_ability(/datum/vampire_passive/nostealth))
 		silent = TRUE
 		blood_to_take *= 0.5 //half blood from targets that aren't being pulled, but they also don't get warned until it starts to cause damage
 	else if(O.grab_state >= GRAB_NECK)
@@ -259,12 +263,12 @@
 		O.visible_message(span_danger("[O] grabs [H]'s neck harshly and sinks in their fangs!"), span_danger("You sink your fangs into [H] and begin to [blood_to_take > BLOOD_SUCK_BASE ? "quickly" : ""] drain their blood."), span_notice("You hear a soft puncture and a wet sucking noise."))
 		playsound(O.loc, 'sound/weapons/bite.ogg', 50, 1)
 	else
-		to_chat(O, span_notice("You stealthily begin to drain blood from [H], be careful, as they will notice if their blood gets too low."))
+		to_chat(O, span_notice("You stealthily begin to drain blood from [H]. Be careful, as they will notice if their blood gets too low."))
 		O.playsound_local(O, 'sound/weapons/bite.ogg', 50, 1)
 	if(!iscarbon(owner))
 		H.LAssailant = null
 	else
-		H.LAssailant = O
+		H.LAssailant = WEAKREF(O)
 	while(do_mob(O, H, 50))
 		if(!is_vampire(O))
 			to_chat(O, span_warning("Your fangs have disappeared!"))
@@ -274,7 +278,7 @@
 			to_chat(O, span_warning("You lose your grip on [H], reducing your bloodsucking speed."))
 		if(blood_to_take == BLOOD_SUCK_BASE && (O.pulling == H && O.grab_state >= GRAB_NECK))//smooth movement from normal suck to aggressive suck
 			blood_to_take *= 1.5
-			to_chat(O, span_warning("Your enchanced grip on [H] allows you to extract blood faster."))
+			to_chat(O, span_warning("Your enhanced grip on [H] allows you to extract blood faster."))
 		if(silent && O.pulling == H) //smooth movement from stealth suck to normal suck
 			silent = FALSE
 			blood_to_take = BLOOD_SUCK_BASE
@@ -286,8 +290,8 @@
 			to_chat(O, span_warning("They've got no blood left to give."))
 			break
 		blood_coeff = 0.8 //20 blood gain at base for living, 30 with aggressive grab, 10 with stealth
-		if(H.stat == DEAD)
-			blood_coeff = 0.2 //5 blood gain at base for dead, 7 with aggressive grab, 2 with stealth
+		if(H.stat == DEAD || !H.client)
+			blood_coeff = 0.2 //5 blood gain at base for dead or uninhabited, 7 with aggressive grab, 2 with stealth
 		blood = round(min(blood_to_take * blood_coeff, H.blood_volume))	//if the victim has less than the amount of blood left to take, just take all of it.
 		total_blood += blood			//get total blood 100% efficiency because fuck waiting out 5 fucking minutes and 1500 actual blood to get your 600 blood for the objective
 		usable_blood += blood * 0.75	//75% usable blood since it's actually used for stuff
@@ -303,7 +307,10 @@
 		if(!silent)
 			playsound(O.loc, 'sound/items/eatfood.ogg', 40, 1, extrarange = -4)//have to be within 3 tiles to hear the sucking
 		else if(H.get_blood_state() <= BLOOD_OKAY)
-			to_chat(H, span_warning("You feel oddly faint..."))
+			to_chat(H, span_warning("You notice [O] standing oddly close..."))
+		if(get_ability(/datum/vampire_passive/nostealth) && silent)
+			to_chat(O, span_boldwarning("You can no longer suck blood silently!"))
+			break
 
 	draining = null
 	to_chat(owner, span_notice("You stop draining [H.name] of blood."))
@@ -408,3 +415,10 @@
 	return result.Join("<br>")
 #undef BLOOD_SUCK_BASE
 #undef ALL_POWERS_UNLOCKED
+
+/datum/antagonist/vampire/get_preview_icon()
+	var/icon/vampire_icon = icon('icons/mob/animal.dmi', "bat")
+
+	vampire_icon.Scale(ANTAGONIST_PREVIEW_ICON_SIZE, ANTAGONIST_PREVIEW_ICON_SIZE)
+
+	return vampire_icon

@@ -1,10 +1,11 @@
 /obj/item/projectile/temp
 	name = "freeze beam"
 	icon_state = "ice_2"
+	pass_flags = PASSTABLE | PASSGLASS | PASSGRILLE
 	damage = 0
 	damage_type = BURN
 	nodamage = FALSE
-	flag = "energy"
+	flag = ENERGY
 	var/temperature = 100
 
 /obj/item/projectile/temp/on_hit(atom/target, blocked = 0)
@@ -12,6 +13,15 @@
 	if(isliving(target))
 		var/mob/living/L = target
 		L.adjust_bodytemperature(((100-blocked)/100)*(temperature - L.bodytemperature)) // the new body temperature is adjusted by 100-blocked % of the delta between body temperature and the bullet's effect temperature
+
+/obj/item/projectile/temp/bounce
+	name = "bouncing freeze ball"
+	icon_state = "pulse1" // only used by kinetic crusher
+	ricochets_max = 5
+	ricochet_chance = 100
+
+/obj/item/projectile/temp/bounce/check_ricochet_flag(atom/A)
+	return TRUE //whatever it is, we bounce on it
 
 /obj/item/projectile/temp/hot
 	name = "heat beam"
@@ -25,5 +35,5 @@
 	var/turf/T = get_turf(src)
 	if(isopenturf(T))
 		var/turf/open/O = T
-		O.freon_gas_act()
+		O.freeze_turf()
 	return ..()

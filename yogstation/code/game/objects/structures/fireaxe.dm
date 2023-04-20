@@ -3,7 +3,8 @@
 	var/datum/effect_system/spark_spread/spark_system	//the spark system, used for generating... sparks?
 
 /obj/structure/fireaxecabinet/bridge
-	req_access = list(ACCESS_CAPTAIN)
+	//bridge fireaxe has different access
+	req_one_access = list(ACCESS_CAPTAIN, ACCESS_CE)
 
 /obj/structure/fireaxecabinet/Initialize()//<-- mirrored/overwritten proc
 	. = ..()
@@ -16,7 +17,9 @@
 
 /obj/structure/fireaxecabinet/Destroy()//<-- mirrored/overwritten proc
 	if(fireaxe)
-		QDEL_NULL(fireaxe)
+		fireaxe.forceMove(get_turf(src))
+	if(spareid)
+		spareid.forceMove(get_turf(src))
 	QDEL_NULL(spark_system)
 	return ..()
 
@@ -27,7 +30,7 @@
 							 "You start to disassemble the [name]...", \
 							 span_italics("You hear wrenching."))
 		playsound(src.loc, 'sound/items/Ratchet.ogg', 50, 1)
-		if(do_after(user, 4 SECONDS/I.toolspeed, target = src))
+		if(do_after(user, 4 SECONDS/I.toolspeed, src))
 			to_chat(user, span_notice("You disassemble the [name]."))
 			var/obj/item/stack/sheet/metal/M = new (loc, 3)//spawn three metal for deconstruction
 			if (prob(50))
@@ -55,7 +58,7 @@
 		return
 	if(!open)
 		to_chat(user, "<span class = 'caution'>Resetting circuitry...</span>")
-		if(do_after(user, 10 SECONDS, target = src))
+		if(do_after(user, 10 SECONDS, src))
 			to_chat(user, span_caution("You [locked ? "disable" : "re-enable"] the locking modules."))
 			src.add_fingerprint(user)
 			toggle_lock(user)

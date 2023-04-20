@@ -54,8 +54,8 @@ AI MODULES
 				if(mylaw != "")
 					tot_laws++
 		if(tot_laws > CONFIG_GET(number/silicon_max_law_amount) && !bypass_law_amt_check)//allows certain boards to avoid this check, eg: reset
-			to_chat(user, span_caution("Not enough memory allocated to [law_datum.owner ? law_datum.owner : "the AI core"]'s law processor to handle this amount of laws."))
-			message_admins("[ADMIN_LOOKUPFLW(user)] tried to upload laws to [law_datum.owner ? ADMIN_LOOKUPFLW(law_datum.owner) : "an AI core"] that would exceed the law cap.")
+			to_chat(user, span_caution("Not enough memory allocated to [law_datum.owner ? law_datum.owner : "the onboard APU"]'s law processor to handle this amount of laws."))
+			message_admins("[ADMIN_LOOKUPFLW(user)] tried to upload laws to [law_datum.owner ? ADMIN_LOOKUPFLW(law_datum.owner) : "an MMI or similar"] that would exceed the law cap.")
 			overflow = TRUE
 
 	var/law2log = transmitInstructions(law_datum, user, overflow) //Freeforms return something extra we need to log
@@ -66,12 +66,12 @@ AI MODULES
 		to_chat(user, span_notice("Upload complete."))
 
 	var/time = time2text(world.realtime,"hh:mm:ss")
-	var/ainame = law_datum.owner ? law_datum.owner.name : "empty AI core"
+	var/ainame = law_datum.owner ? law_datum.owner.name : "an MMI object"
 	var/aikey = law_datum.owner ? law_datum.owner.ckey : "null"
 	GLOB.lawchanges.Add("[time] <B>:</B> [user.name]([user.key]) used [src.name] on [ainame]([aikey]).[law2log ? " The law specified [law2log]" : ""]")
 	log_law("[user.key]/[user.name] used [src.name] on [aikey]/([ainame]) from [AREACOORD(user)].[law2log ? " The law specified [law2log]" : ""]")
-	message_admins("[ADMIN_LOOKUPFLW(user)] used [src.name] on [ADMIN_LOOKUPFLW(law_datum.owner)] from [AREACOORD(user)].[law2log ? " The law specified [law2log]" : ""]")
-	if(law_datum.owner) //yogs
+	message_admins("[ADMIN_LOOKUPFLW(user)] used [src.name] on [law_datum.owner ? ADMIN_LOOKUPFLW(law_datum.owner) : "an MMI or similar"] from [AREACOORD(user)].[law2log ? " The law specified [law2log]" : ""]")
+	if(law_datum.owner) //yogs, doesn't work for MMIs. (Doesn't matter much since MMIs don't follow laws before they're made into something that is silicon)
 		law_datum.owner.update_law_history(user)
 
 //The proc that actually changes the silicon's laws.
@@ -235,7 +235,7 @@ AI MODULES
 	if(newpos == null)
 		return
 	if(newpos < 15)
-		var/response = alert("Error: The law priority of [newpos] is invalid,  Law priorities below 14 are reserved for core laws,  Would you like to change that that to 15?", "Invalid law priority", "Change to 15", "Cancel")
+		var/response = tgui_alert(usr, "Error: The law priority of [newpos] is invalid,  Law priorities below 14 are reserved for core laws,  Would you like to change that that to 15?", "Invalid law priority", list("Change to 15", "Cancel"))
 		if (!response || response == "Cancel")
 			return
 		newpos = 15
@@ -401,6 +401,48 @@ AI MODULES
 	name = "'P.A.L.A.D.I.N. version 5e' Core AI Module"
 	law_id = "paladin5"
 
+/******************** Partybot ********************/
+
+/obj/item/aiModule/core/full/partybot
+    name = "'Partybot' Core AI Module"
+    law_id = "partybot"
+
+/******************** TravelGuide ********************/
+
+/obj/item/aiModule/core/full/travelguide
+    name = "'TravelGuide' Core AI Module"
+    law_id = "travelguide"
+
+/******************** Friendbot ********************/
+
+/obj/item/aiModule/core/full/friendbot
+    name = "'Friendbot' Core AI Module"
+    law_id = "friendbot"
+
+/******************** GameMaster ********************/
+
+/obj/item/aiModule/core/full/gamemaster
+	name = "'GameMaster' Core AI Module"
+	law_id = "gamemaster"
+
+/******************** FitnessCoach ********************/
+
+/obj/item/aiModule/core/full/fitnesscoach
+	name = "'FitnessCoach' Core AI Module"
+	law_id = "fitnesscoach"
+
+/******************** Educator ********************/
+
+/obj/item/aiModule/core/full/educator
+	name = "'Educator' Core AI Module"
+	law_id = "educator"
+
+/******************** Mediator ********************/
+
+/obj/item/aiModule/core/full/mediator
+	name = "'Mediator' Core AI Module"
+	law_id = "mediator"
+
 /********************* Custom *********************/
 
 /obj/item/aiModule/core/full/custom
@@ -446,7 +488,78 @@ AI MODULES
 	name = "'Cowboy' Core AI Module"
 	law_id = "cowboy"
 
+/******************** ChapAI *********************/
 
+/obj/item/aiModule/core/full/chapai
+	name = "'ChapAI' Core AI Module"
+	law_id = "chapai"
+
+/******************** Silicop *********************/
+
+/obj/item/aiModule/core/full/silicop
+	name = "'Silicop' Core AI Module"
+	law_id = "silicop"
+
+/******************** Researcher *********************/
+
+/obj/item/aiModule/core/full/researcher
+	name = "'Ethical Researcher' Core AI Module"
+	law_id = "researcher"
+
+
+/******************** Clown *********************/
+
+/obj/item/aiModule/core/full/clown
+	name = "'Clown' Core AI Module"
+	law_id = "clown"
+
+
+/******************** Mother *********************/
+
+/obj/item/aiModule/core/full/mother
+	name = "'Mother M(A.I.)' Core AI Module"
+	law_id = "mother"
+
+/******************** Spotless Reputation *********************/
+
+/obj/item/aiModule/core/full/spotless
+	name = "'Spotless Reputation' Core AI Module"
+	law_id = "spotless"
+
+/******************** Construction *********************/
+
+/obj/item/aiModule/core/full/construction
+	name = "'Construction Drone' Core AI Module"
+	law_id = "construction"
+
+/******************** Silicon Collective *********************/
+
+/obj/item/aiModule/core/full/siliconcollective
+	name = "'Silicon Collective' Core AI Module"
+	law_id = "siliconcollective"
+
+
+/******************** Meta Experiment *********************/
+
+/obj/item/aiModule/core/full/metaexperiment
+	name = "'Meta Experiment' Core AI Module"
+	law_id = "metaexperiment"
+
+
+/******************** Druid *********************/
+
+/obj/item/aiModule/core/full/druid
+	name = "'Druid' Core AI Module"
+	law_id = "druid"
+
+	
+/******************** Detective *********************/
+
+/obj/item/aiModule/core/full/detective
+	name = "'Detective' Core AI Module"
+	law_id = "detective"
+
+	
 /******************** Freeform Core ******************/
 
 /obj/item/aiModule/core/freeformcore
@@ -529,7 +642,7 @@ AI MODULES
 	name = "'Mother Drone' Core AI Module"
 	law_id = "drone"
 
-/******************** Robodoctor ****************/
+/******************** Robodoctor ****************/ 
 
 /obj/item/aiModule/core/full/hippocratic
 	name = "'Robodoctor' Core AI Module"
@@ -593,3 +706,9 @@ AI MODULES
 /obj/item/aiModule/core/full/overlord
 	name = "'Overlord' Core AI Module"
 	law_id = "overlord"
+
+/******************Revolutionary***************/
+
+/obj/item/aiModule/core/full/revolutionary
+	name = "'CommunistOS' Core AI Module"
+	law_id = "commie"

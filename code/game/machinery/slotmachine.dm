@@ -58,12 +58,12 @@
 		give_payout(balance)
 	return ..()
 
-/obj/machinery/computer/slot_machine/process()
+/obj/machinery/computer/slot_machine/process(delta_time)
 	. = ..() //Sanity checks.
 	if(!.)
 		return .
 
-	money++ //SPESSH MAJICKS
+	money += round(delta_time / 2) //SPESSH MAJICKS
 
 /obj/machinery/computer/slot_machine/update_icon()
 	if(stat & NOPOWER)
@@ -83,7 +83,7 @@
 		var/obj/item/coin/C = I
 		if(paymode == COIN)
 			if(prob(2))
-				if(!user.transferItemToLoc(C, drop_location()))
+				if(!user.transferItemToLoc(C, drop_location(), silent = FALSE))
 					return
 				C.throw_at(user, 3, 10)
 				if(prob(10))
@@ -212,7 +212,7 @@
 		while(working)
 			randomize_reels()
 			updateDialog()
-			sleep(2)
+			sleep(0.2 SECONDS)
 
 	spawn(SPIN_TIME - (REEL_DEACTIVATE_DELAY * reels.len)) //WARNING: no sanity checking for user since it's not needed and would complicate things (machine should still spin even if user is gone), be wary of this if you're changing this code.
 		toggle_reel_spin(0, REEL_DEACTIVATE_DELAY)

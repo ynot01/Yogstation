@@ -9,6 +9,7 @@
 	helptext = "We will know the general direction of nearby changelings, with closer scents being stronger.  Our chemical generation is slowed while this is active."
 	chemical_cost = 0 //Reduces regain rate while active.
 	dna_cost = 2
+	xenoling_available = FALSE
 	var/receptors_active = FALSE
 
 /datum/action/changeling/pheromone_receptors/sting_action(mob/living/carbon/user)
@@ -28,7 +29,7 @@
 //Modified IA pinpointer - Points to the NEAREST changeling, but will only get you within a few tiles of the target.
 //You'll still have to rely on intuition and observation to make the identification.  Lings can 'hide' in public places.
 /datum/status_effect/agent_pinpointer/changeling
-	alert_type = /obj/screen/alert/status_effect/agent_pinpointer/changeling
+	alert_type = /atom/movable/screen/alert/status_effect/agent_pinpointer/changeling
 	minimum_range = CHANGELING_PHEROMONE_MIN_DISTANCE
 	tick_interval = CHANGELING_PHEROMONE_PING_TIME
 	range_fuzz_factor = 0
@@ -53,6 +54,6 @@
 		scan_target = null
 
 
-/obj/screen/alert/status_effect/agent_pinpointer/changeling
+/atom/movable/screen/alert/status_effect/agent_pinpointer/changeling
 	name = "Pheromone Scent"
 	desc = "The nose always knows."

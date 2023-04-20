@@ -366,6 +366,8 @@
 	explosion_block = 2
 	normal_integrity = 400 // reverse engieneerd: 400 * 1.5 (sec lvl 6) = 600 = original
 	security_level = 6
+	rad_insulation = RAD_FULL_INSULATION
+	armor = list(MELEE = 30, BULLET = 30, LASER = 20, ENERGY = 100, BOMB = 10, BIO = 100, RAD = 100, FIRE = 80, ACID = 70) //only changed energy to 100
 
 //////////////////////////////////
 /*
@@ -378,7 +380,6 @@
 	overlays_file = 'icons/obj/doors/airlocks/hatch/overlays.dmi'
 	note_overlay_file = 'icons/obj/doors/airlocks/hatch/overlays.dmi'
 	assemblytype = /obj/structure/door_assembly/door_assembly_hatch
-	can_repaint = FALSE
 	//anim_parts = "ul=-9,9;ur=9,9;dl=-9,-9;dr=9,-9"
 	anim_parts = "ul=-15,0,0,5,-90;ur=0,15,0,5,-90;dl=0,-15,0,5,-90;dr=15,0,0,5,-90"
 	note_attachment = "ul"
@@ -394,7 +395,6 @@
 	anim_parts = "ul=-15,0,0,5,-90;ur=0,15,0,5,-90;dl=0,-15,0,5,-90;dr=15,0,0,5,-90"
 	note_attachment = "ul"
 	panel_attachment = "dr"
-	can_repaint = FALSE
 
 //////////////////////////////////
 /*
@@ -411,6 +411,8 @@
 	normal_integrity = 500
 	security_level = 1
 	damage_deflection = 30
+	rad_insulation = RAD_FULL_INSULATION
+	armor = list(MELEE = 30, BULLET = 30, LASER = 20, ENERGY = 100, BOMB = 10, BIO = 100, RAD = 100, FIRE = 80, ACID = 70) //only changed energy to 100
 
 //////////////////////////////////
 /*
@@ -460,7 +462,6 @@
 	var/openingoverlaytype = /obj/effect/temp_visual/cult/door
 	var/friendly = FALSE
 	var/stealthy = FALSE
-	can_repaint = FALSE
 
 /obj/machinery/door/airlock/cult/Initialize()
 	. = ..()
@@ -550,7 +551,7 @@
 	desc = "An airlock hastily corrupted by blood magic, it is unusually brittle in this state."
 	normal_integrity = 150
 	damage_deflection = 5
-	armor = list("melee" = 0, "bullet" = 0, "laser" = 0,"energy" = 0, "bomb" = 0, "bio" = 0, "rad" = 0, "fire" = 0, "acid" = 0)
+	armor = list(MELEE = 0, BULLET = 0, LASER = 0,ENERGY = 0, BOMB = 0, BIO = 0, RAD = 0, FIRE = 0, ACID = 0)
 
 //Pinion airlocks: Clockwork doors that only let servants of Ratvar through.
 /obj/machinery/door/airlock/clockwork
@@ -567,7 +568,6 @@
 	damage_deflection = 30
 	normal_integrity = 240
 	var/construction_state = GEAR_SECURE //Pinion airlocks have custom deconstruction
-	can_repaint = FALSE
 
 /obj/machinery/door/airlock/clockwork/Initialize()
 	. = ..()
@@ -604,8 +604,8 @@
 	if(src)
 		var/previouscolor = color
 		color = "#960000"
-		animate(src, color = previouscolor, time = 8)
-		addtimer(CALLBACK(src, /atom/proc/update_atom_colour), 8)
+		animate(src, color = previouscolor, time = 0.8 SECONDS)
+		addtimer(CALLBACK(src, /atom/proc/update_atom_colour), 0.8 SECONDS)
 
 /obj/machinery/door/airlock/clockwork/attackby(obj/item/I, mob/living/user, params)
 	if(!attempt_construction(I, user))
@@ -686,7 +686,6 @@
 	assemblytype = null
 	glass = TRUE
 	bound_width = 64 // 2x1
-	can_repaint = FALSE
 
 /obj/machinery/door/airlock/glass_large/narsie_act()
 	return

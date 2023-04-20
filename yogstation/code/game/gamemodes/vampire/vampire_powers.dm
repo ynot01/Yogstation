@@ -63,8 +63,11 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/datum/vampire_passive/nostealth
+	gain_desc = "You are no longer able to conceal yourself while sucking blood."
+
 /datum/vampire_passive/regen
-	gain_desc = "Your rejuvination abilities have improved and will now heal you over time when used."
+	gain_desc = "Your rejuvenation abilities have improved and will now heal you over time when used."
 
 /datum/vampire_passive/vision
 	gain_desc = "Your vampiric vision has improved."
@@ -110,9 +113,9 @@
 		if(V.get_ability(/datum/vampire_passive/regen))
 			U.adjustBruteLoss(-1)
 			U.adjustOxyLoss(-2.5)
-			U.adjustToxLoss(-1)
+			U.adjustToxLoss(-1, TRUE, TRUE)
 			U.adjustFireLoss(-1)
-		sleep(7.5)
+		sleep(0.75 SECONDS)
 
 
 /obj/effect/proc_holder/spell/pointed/gaze
@@ -173,7 +176,7 @@
 
 
 /obj/effect/proc_holder/spell/pointed/hypno
-	name = "Hypnotize"
+	name = "Hypnotize (20)"
 	desc = "Knock out your target."
 	charge_max = 300
 	blood_used = 20
@@ -320,14 +323,14 @@
 	addtimer(CALLBACK(src, /obj/effect/proc_holder/spell/self/revive.proc/revive, L), 600)
 
 /obj/effect/proc_holder/spell/self/revive/proc/revive(mob/living/user)
-	user.revive(full_heal = TRUE)
-	user.visible_message(span_warning("[user] reanimates from death!"), span_notice("We get back up."))
 	var/list/missing = user.get_missing_limbs()
 	if(missing.len)
 		playsound(user, 'sound/magic/demon_consume.ogg', 50, 1)
 		user.visible_message(span_warning("Shadowy matter takes the place of [user]'s missing limbs as they reform!"))
-		user.regenerate_limbs(0, list(BODY_ZONE_HEAD))
+		user.regenerate_limbs()
 		user.regenerate_organs()
+	user.revive(full_heal = TRUE)
+	user.visible_message(span_warning("[user] reanimates from death!"), span_notice("We get back up."))
 
 
 /obj/effect/proc_holder/spell/targeted/disease
@@ -451,7 +454,7 @@
 					to_chat(target, span_danger("Wicked shadows invade your sight, beckoning to you."))
 					to_chat(user, span_notice("We begin to drain [target]'s blood in, so Lilith can bless it."))
 				if(2)
-					to_chat(target, span_danger("Demonic whispers fill your mind, and they become irressistible..."))
+					to_chat(target, span_danger("Demonic whispers fill your mind, and they become irresistible..."))
 				if(3)
 					to_chat(target, span_danger("The world blanks out, and you see a demo- no ange- demon- lil- glory- blessing... Lilith."))
 					to_chat(user, span_notice("Excitement builds up in you as [target] sees the blessing of Lilith."))
@@ -463,9 +466,9 @@
 		if(!QDELETED(user) && !QDELETED(target))
 			to_chat(user, span_notice(". . ."))
 			to_chat(target, span_italics("Come to me, child."))
-			sleep(10)
+			sleep(1 SECONDS)
 			to_chat(target, span_italics("The world hasn't treated you well, has it?"))
-			sleep(15)
+			sleep(1.5 SECONDS)
 			to_chat(target, span_italics("Strike fear into their hearts..."))
 			to_chat(user, "<span class='notice italics bold'>They have signed the pact!</span>")
 			to_chat(target, span_userdanger("You sign Lilith's Pact."))

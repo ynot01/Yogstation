@@ -1,11 +1,12 @@
 /obj/structure/railing
 	name = "railing"
 	desc = "Basic railing meant to protect idiots like you from falling."
-	icon = 'icons/obj/fluff.dmi'
+	icon = 'icons/obj/railing.dmi'
 	icon_state = "railing"
 	density = TRUE
 	anchored = TRUE
 	climbable = TRUE
+	pixel_y = -16
 	climb_time = 10 // not that hard to jump a rail
 	climb_stun = 0 // if you dont fall
 	///Initial direction of the railing.
@@ -67,32 +68,41 @@
 /obj/structure/railing/CanAllowThrough(atom/movable/mover, turf/target)
 	. = ..()
 	if(get_dir(loc, target) & dir)
-		return !density
+		var/checking = FLYING | FLOATING
+		return . || mover.throwing || mover.movement_type & checking
 	return TRUE
 
 /obj/structure/railing/corner/CanAllowThrough(atom/movable/mover, turf/target)
 	. = ..()
 	return TRUE
 
-/obj/structure/railing/CheckExit(atom/movable/O, turf/target)
+/obj/structure/railing/CheckExit(atom/movable/mover, turf/target)
 	..()
 	if(get_dir(loc, target) & dir)
-		return 0
-	return 1
+		var/checking = UNSTOPPABLE | FLYING | FLOATING
+		return !density || mover.throwing || mover.movement_type & checking || mover.move_force >= MOVE_FORCE_EXTREMELY_STRONG
+	return TRUE
 
 /obj/structure/railing/corner/CheckExit()
-	return 1
+	return TRUE
 
-/obj/structure/railing/proc/can_be_rotated(mob/user,rotation_type)
+/obj/structure/railing/proc/can_be_rotated(mob/user, rotation_type)
+	var/silent = FALSE
+	if(!Adjacent(user))
+		silent = TRUE
+
 	if(anchored)
-		to_chat(user, span_warning("[src] cannot be rotated while it is fastened to the floor!"))
+		if (!silent)
+			to_chat(user, span_warning("[src] cannot be rotated while it is fastened to the floor!"))
 		return FALSE
 
 	var/target_dir = turn(dir, rotation_type == ROTATION_CLOCKWISE ? -90 : 90)
 
 	if(!valid_window_location(loc, target_dir)) //Expanded to include rails, as well!
-		to_chat(user, span_warning("[src] cannot be rotated in that direction!"))
+		if (!silent)
+			to_chat(user, span_warning("[src] cannot be rotated in that direction!"))
 		return FALSE
+
 	return TRUE
 
 /obj/structure/railing/proc/check_anchored(checked_anchored)

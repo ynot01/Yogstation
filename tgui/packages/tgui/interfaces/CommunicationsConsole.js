@@ -283,7 +283,7 @@ const PageMain = (props, context) => {
     shuttleCalledPreviously,
     shuttleCanEvacOrFailReason,
     shuttleLastCalled,
-    canPrintId,
+    canPrintIdAndCode,
     shuttleRecallable,
   } = data;
 
@@ -304,37 +304,36 @@ const PageMain = (props, context) => {
   return (
     <Box>
       <Section title="Emergency Shuttle">
-        {
-          shuttleCalled
-            ? <Button.Confirm
-              icon="space-shuttle"
-              content="Recall Emergency Shuttle"
-              color="bad"
-              disabled={!canRecallShuttles || !shuttleRecallable}
-              tooltip={(
-                canRecallShuttles && (
-                  !shuttleRecallable && "It's too late for the emergency shuttle to be recalled."
-                ) || (
-                  "You do not have permission to recall the emergency shuttle."
-                )
-              )}
-              tooltipPosition="bottom-right"
-              onClick={() => act("recallShuttle")}
-            />
-            : <Button
-              icon="space-shuttle"
-              content="Call Emergency Shuttle"
-              disabled={shuttleCanEvacOrFailReason !== 1}
-              tooltip={
-                shuttleCanEvacOrFailReason !== 1
-                  ? shuttleCanEvacOrFailReason
-                  : undefined
-              }
-              tooltipPosition="bottom-right"
-              onClick={() => setCallingShuttle(true)}
-            />
-        }
-
+        {shuttleCalled && (
+          <Button.Confirm
+            icon="space-shuttle"
+            content="Recall Emergency Shuttle"
+            color="bad"
+            disabled={!canRecallShuttles || !shuttleRecallable}
+            tooltip={(
+              canRecallShuttles && (
+                !shuttleRecallable && "It's too late for the emergency shuttle to be recalled."
+              ) || (
+                "You do not have permission to recall the emergency shuttle."
+              )
+            )}
+            tooltipPosition="bottom-end"
+            onClick={() => act("recallShuttle")}
+          />
+        ) || (
+          <Button
+            icon="space-shuttle"
+            content="Call Emergency Shuttle"
+            disabled={shuttleCanEvacOrFailReason !== 1}
+            tooltip={
+              shuttleCanEvacOrFailReason !== 1
+                ? shuttleCanEvacOrFailReason
+                : undefined
+            }
+            tooltipPosition="bottom-end"
+            onClick={() => setCallingShuttle(true)}
+          />
+        )}
         {!!shuttleCalledPreviously && (
           shuttleLastCalled && (
             <Box>
@@ -388,11 +387,19 @@ const PageMain = (props, context) => {
             onClick={() => act("makeVoiceAnnouncement")}
           />}
 
-          {!!canPrintId && <Button
+          {!!canPrintIdAndCode && <Button
             icon="id-card"
             disabled={!importantActionReady}
             content="Print Emergency ID"
             onClick={() => act("printSpare")}
+          />}
+
+          {!!canPrintIdAndCode && <Button
+            icon="key"
+            disabled={!importantActionReady}
+            content="Print AI Control Code"
+            tooltip={"Prints a password for making new AI control consoles. Will cancel all previous passwords."}
+            onClick={() => act("printAIControlCode")}
           />}
 
           {!!canToggleEmergencyAccess && <Button.Confirm

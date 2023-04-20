@@ -26,14 +26,10 @@
 
 /datum/uplink_item/stealthy_weapons/romerol_kit
 	category = "Conspicuous Weapons"
-	include_objectives = list(/datum/objective/hijack, /datum/objective/martyr)
+	include_objectives = list(/datum/objective/hijack, /datum/objective/martyr, /datum/objective/nuclear)
 
 /datum/uplink_item/stealthy_weapons/soap_clusterbang
 	category = "Conspicuous Weapons"
-
-/datum/uplink_item/device_tools/hypnotic_flash
-	restricted_roles = list("Psychiatrist")
-	category = "Role-Restricted"
 
 
 /datum/uplink_item/dangerous/syndicate_minibomb
@@ -66,15 +62,32 @@
 /datum/uplink_item/device_tools/arm
 	name = "Additional Arm"
 	desc = "An additional arm, automatically added to your body upon purchase, allows you to use more items at once"
-	item = /obj/item/melee/supermatter_sword //doesn't actually spawn a supermatter sword, but it needs an object to show up in the menu :^)
+	item = /obj/item/bodypart/l_arm //doesn't actually spawn an arm, but it needs an object to show up in the menu :^)
 	cost = 5
 	surplus = 0
 	exclude_modes = list(/datum/game_mode/nuclear)
+	illegal_tech = FALSE // ARMS ARE NOT ILLEGAL
 
 /datum/uplink_item/device_tools/arm/spawn_item(spawn_item, mob/user)
 	var/limbs = user.held_items.len
 	user.change_number_of_hands(limbs+1)
 	to_chat(user, "You feel more dexterous")
+
+/datum/uplink_item/explosives/trap_disk
+	name = "Syndicate Trapped Disk"
+	desc = "A bomb disguised as a syndicate disk that triggers on removal or when tampered with. Nanotrasen IT staff will likely be able to identify its true nature at a glance."
+	item = /obj/item/computer_hardware/hard_drive/portable/syndicate/trap
+	cost = 5
+	surplus = 10
+
+/datum/uplink_item/device_tools/ntnet_dos
+	name = "DoS Traffic Generator Disk"
+	desc = "An advanced script in a portable disk that can perform denial of service attacks against NTNet quantum relays. \
+			The system administrator will probably notice this. \
+			Multiple devices can run this program together against the same relay for increased effect."
+	item = /obj/item/computer_hardware/hard_drive/portable/syndicate/ntnet_dos
+	cost = 2
+	surplus = 10
 
 /datum/uplink_item/race_restricted/xeno_organ_kit
 	name = "Xenomorph Organ Kit"
@@ -128,45 +141,40 @@
 	cost = 40
 	cant_discount = TRUE
 
-// Events
-/datum/uplink_item/services
-	category = "Services"
-	include_modes = list(/datum/game_mode/infiltration, /datum/game_mode/nuclear)
-	surplus = 0
-	restricted = TRUE
+/datum/uplink_item/race_restricted/garden_warfare
+	name = "Martial art scroll"
+	desc = "A special scroll with a martial art, that teaches phytosians of capabilities of their body."
+	cost = 13
+	item = /obj/item/book/granter/martial/garden_warfare
+	restricted_species = list("pod")
 
-/datum/uplink_item/services/manifest_spoof
-	name = "Crew Manifest Spoof"
-	desc = "A button capable of adding a single person to the crew manifest."
-	item = /obj/item/service/manifest
-	cost = 15 //Maybe this is too cheap??
+/datum/uplink_item/race_restricted/combat_modules
+	name = "Combat Modules Board"
+	desc = "An upgrade board, containing upgrades and programs for your melee attacks."
+	cost = 11
+	item = /obj/item/book/granter/martial/preternis_stealth
+	restricted_species = list("preternis")
 
-/datum/uplink_item/services/fake_ion
-	name = "Fake Ion Storm"
-	desc = "Fakes an ion storm announcment. A good distraction, especially if the AI is weird anyway."
-	item = /obj/item/service/ion
-	cost = 7
+/datum/uplink_item/race_restricted/explosive_fist_art
+	name = "Burned scroll"
+	desc = "An ancient scroll, containing a guide to an ancient plasmamen martial art."
+	cost = 14
+	item = /obj/item/book/granter/martial/explosive_fist
+	restricted_species = list("plasmaman")
 
-/datum/uplink_item/services/fake_meteor
-	name = "Fake Meteor Announcement"
-	desc = "Fakes an meteor announcment. A good way to get any C4 on the station exterior, or really any small explosion, brushed off as a meteor hit."
-	item = /obj/item/service/meteor
-	cost = 7
+/datum/uplink_item/race_restricted/ultra_violence
+	name = "Version one upgrade module"
+	desc = "A module full of forbidden techniques that will make you capable of ultimate bloodshed. \
+			If you install this, it will make you incapable of pushing and pulling. \
+			There are no half-measures, either you succeed or you die."
+	cost = 16
+	item = /obj/item/book/granter/martial/ultra_violence
+	restricted_species = list("ipc")
 
-/datum/uplink_item/services/fake_rod
-	name = "Fake Immovable Rod"
-	desc = "Fakes an immovable rod announcement. Good for a short-lasting distraction."
-	item = /obj/item/service/rodgod
-	cost = 6 //less likely to be believed
+/datum/uplink_item/stealthy_weapons/camera_flash
+	name = "Camera Flash"
+	desc = "A camera with an upgraded flashbulb. Can be used much like a handheld flash except with a longer cooldown between uses, allowing the bulb to cool down — avoiding burning out altogether."
+	item = /obj/item/camera/tator
+	cost = 4
+	surplus = 15
 
-//Infiltrator shit
-/datum/uplink_item/infiltration
-	category = "Infiltration Gear"
-	include_modes = list(/datum/game_mode/infiltration)
-	surplus = 0
-
-/datum/uplink_item/infiltration/extra_stealthsuit
-	name = "Extra Chameleon Hardsuit"
-	desc = "An infiltration hardsuit, capable of changing it's appearance instantly."
-	item = /obj/item/clothing/suit/space/hardsuit/infiltration
-	cost = 10

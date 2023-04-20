@@ -20,8 +20,6 @@
 
 	///efficiency, used to increase the effect of some healing methods
 	var/efficiency = 1
-	///maximum status stasis will activate at, occurs automatically
-	var/stasis_health = UNCONSCIOUS
 	///treatments currently available for use
 	var/list/available_treatments
 	///if the patient is able to use the sleeper's controls
@@ -38,8 +36,17 @@
 	///if the sleeper puts its patient into stasis
 	var/stasis = FALSE
 	var/enter_message = "<span class='notice'><b>You feel cool air surround you. You go numb as your senses turn inward.</b></span>"
+	var/open_sound = 'sound/machines/podopen.ogg'
+	var/close_sound = 'sound/machines/podclose.ogg'
 	payment_department = ACCOUNT_MED
 	fair_market_price = 5
+
+	///what chemical we're injecting with the "sedate" function
+	var/sedate_chem = /datum/reagent/medicine/morphine
+	///maximum allowed chemical volume
+	var/sedate_limit = 20
+	///what are we putting in the tgui
+	var/sedate_button_text = "Sedate"
 
 /obj/machinery/sleeper/Initialize()
 	. = ..()
@@ -88,6 +95,8 @@
 		if(mob_occupant)
 			mob_occupant.remove_status_effect(STATUS_EFFECT_STASIS)
 		flick("[initial(icon_state)]-anim", src)
+		if(open_sound)
+			playsound(src, open_sound, 40)
 		..()
 
 /obj/machinery/sleeper/close_machine(mob/user)
@@ -99,6 +108,8 @@
 			to_chat(occupant, "[enter_message]")
 		if(mob_occupant && stasis)
 			mob_occupant.ExtinguishMob()
+		if(close_sound)
+			playsound(src, close_sound, 40)
 
 /obj/machinery/sleeper/emp_act(severity)
 	. = ..()
@@ -181,15 +192,17 @@
 /obj/machinery/sleeper/process()
 	..()
 	check_nap_violations()
+	if(issilicon(occupant))
+		return
 	var/mob/living/carbon/C = occupant
 	if(C)
-		if(stasis && C.stat >= stasis_health)
-			C.apply_status_effect(STATUS_EFFECT_STASIS, null, TRUE)
+		if(stasis && (C.stat == DEAD || C.health < 0))
+			C.apply_status_effect(STATUS_EFFECT_STASIS, null, TRUE, -1)
 		else
 			C.remove_status_effect(STATUS_EFFECT_STASIS)
 		if(obj_flags & EMAGGED)
 			var/existing = C.reagents.get_reagent_amount(/datum/reagent/toxin/amanitin)
-			C.reagents.add_reagent(/datum/reagent/toxin/amanitin, max(0, 1 - existing)) //this should be enough that you immediately eat shit on exiting but not before
+			C.reagents.add_reagent(/datum/reagent/toxin/amanitin, max(0, 1.5 - existing)) //this should be enough that you immediately eat shit on exiting but not before
 		switch(active_treatment)
 			if(SLEEPER_TEND)
 				C.heal_bodypart_damage(SLEEPER_HEAL_RATE,SLEEPER_HEAL_RATE) //this is slow as hell, use the rest of medbay you chumps
@@ -202,13 +215,15 @@
 						var/healed = FALSE
 						var/obj/item/organ/heal_target = C.getorganslot(o)
 						if(heal_target?.damage >= 1)
-							var/organ_healing = C.stat == DEAD ? 0.05 : 0.2
+							var/organ_healing = C.stat == DEAD ? 0.5 : 1
 							heal_target.applyOrganDamage(-organ_healing)
 							healed = TRUE
 						if(healed)
 							break
 			if(SLEEPER_CHEMPURGE)
 				C.adjustToxLoss(-SLEEPER_HEAL_RATE)
+				if(obj_flags & EMAGGED)
+					return
 				var/purge_rate = 0.5 * efficiency
 				for(var/datum/reagent/R in C.reagents.reagent_list)
 					if(istype(R, /datum/reagent/toxin))
@@ -228,6 +243,7 @@
 	data["open"] = state_open
 	data["active_treatment"] = active_treatment
 	data["can_sedate"] = can_sedate()
+	data["sedate_text"] = sedate_button_text
 
 	data["treatments"] = list()
 	for(var/T in available_treatments)
@@ -289,7 +305,7 @@
 			. = TRUE
 		if("sedate")
 			if(can_sedate())
-				mob_occupant.reagents.add_reagent(/datum/reagent/medicine/morphine, 10)
+				mob_occupant.reagents.add_reagent(sedate_chem, 10)
 				if(usr)
 					log_combat(usr,occupant, "injected morphine into", addition = "via [src]")
 				. = TRUE
@@ -298,7 +314,7 @@
 	var/mob/living/mob_occupant = occupant
 	if(!mob_occupant || !mob_occupant.reagents)
 		return
-	return mob_occupant.reagents.get_reagent_amount(/datum/reagent/medicine/morphine) + 10 <= 20
+	return mob_occupant.reagents.get_reagent_amount(sedate_chem) + 10 <= sedate_limit
 
 /obj/machinery/sleeper/syndie
 	icon_state = "sleeper_s"

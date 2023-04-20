@@ -1,23 +1,31 @@
 /obj/item/mecha_parts/mecha_equipment/weapon
 	name = "mecha weapon"
-	range = RANGED
+	range = MECHA_RANGED
 	destroy_sound = 'sound/mecha/weapdestr.ogg'
+	/// Typepath of the projectile
 	var/projectile
+	/// Firing Sound
 	var/fire_sound
+	/// How many projectiles does it shoot
 	var/projectiles_per_shot = 1
+	/// Amount of preditable spread in the shot
 	var/variance = 0
-	var/randomspread = 0 //use random spread for machineguns, instead of shotgun scatter
+	/// Amount of unpredictable spread in the shot
+	var/randomspread = 0
+	/// Firing delay
 	var/projectile_delay = 0
-	var/firing_effect_type = /obj/effect/temp_visual/dir_setting/firing_effect	//the visual effect appearing when the weapon is fired.
-	var/kickback = TRUE //Will using this weapon in no grav push mecha back.
+	/// Visual effect when fired
+	var/firing_effect_type = /obj/effect/temp_visual/dir_setting/firing_effect
+	/// Will this push the mech back when used in no gravity
+	var/kickback = TRUE
 	mech_flags = EXOSUIT_MODULE_COMBAT
 
 /obj/item/mecha_parts/mecha_equipment/weapon/can_attach(obj/mecha/M)
 	if(!..())
 		return FALSE
-	if(istype(M, /obj/mecha/combat))
+	if((locate(/obj/item/mecha_parts/concealed_weapon_bay) in M.contents) && !((locate(/obj/item/mecha_parts/mecha_equipment/melee_weapon) in M.equipment) || (locate(/obj/item/mecha_parts/mecha_equipment/weapon) in M.equipment) ))
 		return TRUE
-	if((locate(/obj/item/mecha_parts/concealed_weapon_bay) in M.contents) && !(locate(/obj/item/mecha_parts/mecha_equipment/weapon) in M.equipment))
+	if(M.guns_allowed)
 		return TRUE
 	return FALSE
 
@@ -117,8 +125,8 @@
 	name = "\improper MKIV ion heavy cannon"
 	desc = "A weapon for combat exosuits. Shoots technology-disabling ion beams. Don't catch yourself in the blast!"
 	icon_state = "mecha_ion"
-	energy_drain = 120
-	projectile = /obj/item/projectile/ion
+	energy_drain = 200
+	projectile = /obj/item/projectile/ion/heavy	//Big boy 2/2 EMP bolts
 	fire_sound = 'sound/weapons/laser.ogg'
 
 /obj/item/mecha_parts/mecha_equipment/weapon/energy/tesla
@@ -152,10 +160,32 @@
 	energy_drain = 30
 	projectile = /obj/item/projectile/plasma/adv/mech
 	fire_sound = 'sound/weapons/plasma_cutter.ogg'
-	harmful = TRUE
+	harmful = FALSE
 
 /obj/item/mecha_parts/mecha_equipment/weapon/energy/plasma/can_attach(obj/mecha/M)
-	if(..()) //combat mech
+	if(M.melee_allowed && !M.guns_allowed)	//Should only hold true for melee mechs
+		return 0
+	else if(..()) 	//combat mech
+		return 1
+	else if(M.equipment.len < M.max_equip && istype(M))
+		return 1
+	return 0
+
+/obj/item/mecha_parts/mecha_equipment/weapon/energy/mecha_kineticgun
+	equip_cooldown = 10
+	name = "Exosuit Proto-kinetic Accelerator"
+	desc = "An exosuit-mounted mining tool that does increased damage in low pressure. Drawing from an onboard power source allows it to project further than the handheld version."
+	icon_state = "mecha_kineticgun"
+	energy_drain = 30
+	projectile = /obj/item/projectile/kinetic/mech
+	fire_sound = 'sound/weapons/kenetic_accel.ogg'
+	harmful = FALSE
+
+//attachable to all mechas, like the plasma cutter
+/obj/item/mecha_parts/mecha_equipment/weapon/energy/mecha_kineticgun/can_attach(obj/mecha/M)
+	if(M.melee_allowed && !M.guns_allowed)	//Should only hold true for melee mechs
+		return 0
+	else if(..()) 	//combat mech
 		return 1
 	else if(M.equipment.len < M.max_equip && istype(M))
 		return 1
@@ -177,7 +207,7 @@
 	icon_state = "mecha_honker"
 	energy_drain = 200
 	equip_cooldown = 150
-	range = MELEE|RANGED
+	range = MECHA_MELEE|MECHA_RANGED
 	kickback = FALSE
 	mech_flags = EXOSUIT_MODULE_HONK
 
@@ -204,9 +234,9 @@
 		M.SetSleeping(0)
 		M.stuttering += 20
 		M.adjustEarDamage(0, 30)
-		M.Paralyze(60)
+		M.Knockdown(60)
 		if(prob(30))
-			M.Stun(200)
+			M.Stun(100)
 			M.Unconscious(80)
 		else
 			M.Jitter(500)
@@ -301,7 +331,7 @@
 /obj/item/mecha_parts/mecha_equipment/weapon/ballistic/silenced
 	name = "\improper S.H.H. \"Quietus\" Carbine"
 	desc = "A weapon for combat exosuits. A mime invention, field tests have shown that targets cannot even scream before going down."
-	fire_sound = 'sound/weapons/gunshot_silenced.ogg'
+	fire_sound = null
 	icon_state = "mecha_mime"
 	equip_cooldown = 30
 	projectile = /obj/item/projectile/bullet/mime
@@ -315,10 +345,10 @@
 	icon_state = "mecha_scatter"
 	equip_cooldown = 20
 	projectile = /obj/item/projectile/bullet/scattershot
-	projectiles = 40
-	projectiles_cache = 40
-	projectiles_cache_max = 160
-	projectiles_per_shot = 4
+	projectiles = 72
+	projectiles_cache = 72
+	projectiles_cache_max = 288
+	projectiles_per_shot = 6
 	variance = 25
 	harmful = TRUE
 	ammo_type = "scattershot"
@@ -467,7 +497,7 @@
 	icon_state = "mecha_punching_glove"
 	energy_drain = 250
 	equip_cooldown = 20
-	range = MELEE|RANGED
+	range = MECHA_MELEE|MECHA_RANGED
 	missile_range = 5
 	projectile = /obj/item/punching_glove
 	fire_sound = 'sound/items/bikehorn.ogg'

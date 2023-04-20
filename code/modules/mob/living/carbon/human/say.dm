@@ -1,5 +1,10 @@
 /mob/living/carbon/human/say_mod(input, message_mode)
-	verb_say = dna.species.say_mod
+	var/rare_verb = LAZYLEN(dna.species.rare_say_mod) ? pick(dna.species.rare_say_mod) : null
+	if (rare_verb && prob(dna.species.rare_say_mod[rare_verb]))
+		verb_say = rare_verb
+	else
+		verb_say = dna.species.say_mod
+	
 	if(slurring)
 		return "slurs"
 	else
@@ -62,16 +67,15 @@
 	if(message_mods[MODE_HEADSET])
 		if(ears)
 			ears.talk_into(src, message, , spans, language, message_mods)
-		return ITALICS | REDUCE_RANGE
+			return ITALICS | REDUCE_RANGE
 	else if(message_mods[RADIO_EXTENSION] == MODE_DEPARTMENT)
 		if(ears)
 			ears.talk_into(src, message, message_mods[RADIO_EXTENSION], spans, language, message_mods)
-		return ITALICS | REDUCE_RANGE
+			return ITALICS | REDUCE_RANGE
 	else if(GLOB.radiochannels[message_mods[RADIO_EXTENSION]])
 		if(ears)
 			ears.talk_into(src, message, message_mods[RADIO_EXTENSION], spans, language, message_mods)
 			return ITALICS | REDUCE_RANGE
-
 	return 0
 
 /mob/living/carbon/human/get_alt_name()

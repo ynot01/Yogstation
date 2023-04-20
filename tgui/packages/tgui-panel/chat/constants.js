@@ -36,6 +36,7 @@ export const MESSAGE_TYPE_ADMINLOG = 'adminlog';
 export const MESSAGE_TYPE_ATTACKLOG = 'attacklog';
 export const MESSAGE_TYPE_DEBUG = 'debug';
 export const MESSAGE_TYPE_MENTORPM = 'mentorpm';
+export const MESSAGE_TYPE_DONATOR = 'donator';
 
 // Metadata for each message type
 export const MESSAGE_TYPES = [
@@ -82,7 +83,7 @@ export const MESSAGE_TYPES = [
     type: MESSAGE_TYPE_OOC,
     name: 'OOC',
     description: 'The bluewall of global OOC messages',
-    selector: '.ooc, .adminooc',
+    selector: '.ooc, .adminooc, .adminobserverooc',
   },
   {
     type: MESSAGE_TYPE_ADMINPM,
@@ -95,6 +96,12 @@ export const MESSAGE_TYPES = [
     name: 'Mentor PMs',
     description: 'Messages to/from mentors (mentorhelp)',
     selector: '.mentor',
+  },
+  {
+    type: MESSAGE_TYPE_DONATOR,
+    name: "Donator",
+    description: 'Messages to/from donators',
+    selector: '.donator',
   },
   {
     type: MESSAGE_TYPE_COMBAT,

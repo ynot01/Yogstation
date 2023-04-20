@@ -72,6 +72,8 @@
 
 	if(AH)
 		message_admins("[key_name_admin(src)] has started replying to [key_name_admin(C, 0, 0)]'s admin help.")
+		if(!AH.handling_admin)
+			AH.Administer(TRUE)
 	var/msg = input(src,"Message:", "Private message to [C.holder?.fakekey ? "an Administrator" : key_name(C, 0, 0)].") as message|null
 	if (!msg)
 		message_admins("[key_name_admin(src)] has cancelled their reply to [key_name_admin(C, 0, 0)]'s admin help.")
@@ -98,9 +100,6 @@
 			html = span_notice("Message: [msg]"),
 			confidential = TRUE)
 
-		return
-
-	if(!holder && !current_ticket)	//no ticket? https://www.youtube.com/watch?v=iHSPf6x1Fdo
 		return
 
 	var/client/recipient
@@ -145,9 +144,16 @@
 
 		//get message text, limit it's length.and clean/escape html
 		if(!msg)
+			if(holder)
+				message_admins("[key_name_admin(src)] has started replying to [key_name_admin(recipient, 0, 0)]'s admin help.")
+				var/datum/admin_help/AH = recipient.current_ticket
+				if(AH && !AH.handling_admin)
+					AH.Administer(TRUE)
 			msg = input(src,"Message:", "Private message to [recipient.holder?.fakekey ? "an Administrator" : key_name(recipient, 0, 0)].") as message|null
 			msg = trim(msg)
 			if(!msg)
+				if(holder)
+					message_admins("[key_name_admin(src)] has cancelled their reply to [key_name_admin(recipient, 0, 0)]'s admin help.")
 				return
 
 			if(prefs.muted & MUTE_ADMINHELP)
@@ -188,10 +194,9 @@
 	else
 		if(recipient.holder)
 			if(holder)
-				to_chat(recipient,
-					type = MESSAGE_TYPE_ADMINPM,
-					html = span_danger("Admin PM from-<b>[key_name(src, recipient, 1)]</b>: [span_linkify("[keywordparsedmsg]")]"),
-					confidential = TRUE)
+				to_chat(recipient, "<font color='red' size='4'><b>-- Administrator private message --</b></font>", confidential=TRUE)
+				to_chat(recipient, span_adminsay("Admin PM from-<b>[key_name(src, recipient, 0)]</b>: [span_linkify("[msg]")]"), confidential=TRUE)
+				to_chat(recipient, span_adminsay("<i>Click on the administrator's name to reply.</i>"), confidential=TRUE)
 				to_chat(src,
 					type = MESSAGE_TYPE_ADMINPM,
 					html = span_notice("Admin PM to-<b>[key_name(recipient, src, 1)]</b>: [span_linkify("[keywordparsedmsg]")]"),
@@ -200,8 +205,10 @@
 				//omg this is dumb, just fill in both their tickets
 				// yogs start - Yog Tickets
 				admin_ticket_log(src, msg, FALSE)
+				if(!recipient.current_ticket && !current_ticket) // creates a ticket if there is no ticket of either user
+					new /datum/admin_help(msg, recipient, TRUE) // yogs - Yog Tickets
 				if(recipient.current_ticket && !recipient.current_ticket.handling_admin)
-					recipient.current_ticket.Administer(src)
+					recipient.current_ticket.Administer()
 				// yogs end - Yog Tickets
 				if(recipient != src)	//reeee
 					admin_ticket_log(recipient, msg, FALSE) // yogs - Yog Tickets
@@ -225,7 +232,10 @@
 				if(!recipient.current_ticket)
 					new /datum/admin_help(msg, recipient, TRUE) // yogs - Yog Tickets
 				if(!recipient.current_ticket.handling_admin)
-					recipient.current_ticket.Administer(src) // yogs - Yog Tickets
+					recipient.current_ticket.Administer() // yogs - Yog Tickets
+				if(recipient.current_ticket.handling_admin != usr.client)
+					if(tgui_alert(usr, "You are replying to a ticket administered by [recipient.current_ticket.handling_admin], are you sure you wish to continue?", "Confirm", list("Yes", "No")) != "Yes")
+						return
 
 				to_chat(recipient, "<font color='red' size='4'><b>-- Administrator private message --</b></font>", confidential=TRUE)
 				to_chat(recipient, span_adminsay("Admin PM from-<b>[key_name(src, recipient, 0)]</b>: [span_linkify("[msg]")]"), confidential=TRUE)
@@ -259,7 +269,7 @@
 
 	if(irc)
 		log_admin_private("PM: [key_name(src)]->IRC: [rawmsg]")
-		for(var/client/X in GLOB.admins)
+		for(var/client/X in GLOB.permissions.admins)
 			to_chat(X,
 				type = MESSAGE_TYPE_ADMINPM,
 				html = span_notice("<B>PM: [key_name(src, X, 0)]-&gt;External:</B> [keywordparsedmsg]"),
@@ -268,7 +278,7 @@
 		window_flash(recipient, ignorepref = TRUE)
 		log_admin_private("PM: [key_name(src)]->[key_name(recipient)]: [rawmsg]")
 		//we don't use message_admins here because the sender/receiver might get it too
-		for(var/client/X in GLOB.admins)
+		for(var/client/X in GLOB.permissions.admins)
 			if(X.key!=key && X.key!=recipient.key)	//check client/X is an admin and isn't the sender or recipientD
 				to_chat(X,
 					type = MESSAGE_TYPE_ADMINPM,

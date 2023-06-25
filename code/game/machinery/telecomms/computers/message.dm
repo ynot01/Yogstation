@@ -23,6 +23,7 @@
 	var/datum/effect_system/spark_spread/spark_system = new /datum/effect_system/spark_spread
 	//Messages - Saves me time if I want to change something.
 	var/noserver = span_alert("ALERT: No server detected.")
+	var/farserver = span_alert("ALERT: Server out of range.")
 	var/incorrectkey = span_warning("ALERT: Incorrect decryption key!")
 	var/defaultmsg = span_notice("Welcome. Please select an option.")
 	var/rebootmsg = span_warning("%$&(£: Critical %$$@ Error // !RestArting! <lOadiNg backUp iNput ouTput> - ?pLeaSe wAit!")
@@ -283,6 +284,8 @@
 		if (href_list["active"])
 			if(LINKED_SERVER_NONRESPONSIVE)
 				message = noserver
+			else if(linkedServer.z != src.z)
+				message = farserver
 			else if(auth)
 				linkedServer.toggled = !linkedServer.toggled
 		//Find a server

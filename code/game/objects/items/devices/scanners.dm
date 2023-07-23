@@ -43,7 +43,7 @@ GENE SCANNER
 
 /obj/item/t_scanner/attack_self(mob/user)
 	toggle_on()
-	
+
 /obj/item/t_scanner/AltClick(mob/user)
 	if(!user.canUseTopic(src, BE_CLOSE))
 		return
@@ -389,7 +389,7 @@ GENE SCANNER
 	var/temp_span = "notice"
 	if(M.bodytemperature <= BODYTEMP_HEAT_DAMAGE_LIMIT || M.bodytemperature >= BODYTEMP_COLD_DAMAGE_LIMIT)
 		temp_span = "warning"
-	
+
 	combined_msg += "<span_class = '[temp_span]'>Body temperature: [round(M.bodytemperature-T0C,0.1)] &deg;C ([round(M.bodytemperature*1.8-459.67,0.1)] &deg;F)</span>"
 
 	// Time of death
@@ -457,9 +457,16 @@ GENE SCANNER
 	var/list/combined_msg = list()
 	if(istype(M))
 		if(M.reagents)
-			if(M.reagents.reagent_list.len)
+			var/has_non_hidden_reagents = FALSE
+			for(var/datum/reagent/R in M.reagents.reagent_list)
+				if(!R.hidden)
+					has_non_hidden_reagents = TRUE
+					break
+			if(M.reagents.reagent_list.len && (has_non_hidden_reagents || isobserver(user)))
 				combined_msg += span_notice("Subject contains the following reagents:")
 				for(var/datum/reagent/R in M.reagents.reagent_list)
+					if(R.hidden && !isobserver(user))
+						continue
 					combined_msg += "[span_notice("[round(R.volume, 0.001)] units of [R.name]")][R.overdosed == 1 ? "- [span_boldannounce("OVERDOSING")]" : "."]"
 			else
 				combined_msg += span_notice("Subject contains no reagents.")
@@ -603,7 +610,7 @@ GENE SCANNER
 		user.put_in_hands(new /obj/item/bot_assembly/atmosbot)
 	else
 		..()
-		
+
 /obj/item/analyzer/attack_self(mob/user)
 	add_fingerprint(user)
 	scangasses(user)			//yogs start: Makes the gas scanning able to be used elseware

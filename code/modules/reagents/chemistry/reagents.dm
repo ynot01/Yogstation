@@ -70,7 +70,8 @@ GLOBAL_LIST_INIT(name2reagent, build_name2reagent())
 	var/metabolizing = FALSE
 	/// is it bad for you? Currently only used for borghypo. C2s and Toxins have it TRUE by default.
 	var/harmful = FALSE
-	/// Are we from a material? We might wanna know that for special stuff. Like metalgen. Is replaced with a ref of the material on New()
+	/// Is hidden from health scanners? Still shows up in liquid form
+	var/hidden = FALSE
 
 /datum/reagent/Destroy() // This should only be called by the holder, so it's already handled clearing its references
 	. = ..()

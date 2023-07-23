@@ -249,6 +249,11 @@
 	color = "#8BA6E9" // rgb: 139, 166, 233
 	taste_description = "mint"
 
+/datum/reagent/consumable/frostoil/changeling
+	name = "Changeling Frost"
+	description = "Crystalline, cool to the touch."
+	hidden = TRUE
+
 /datum/reagent/consumable/frostoil/on_mob_life(mob/living/carbon/M)
 	var/cooling = 0
 	switch(current_cycle)

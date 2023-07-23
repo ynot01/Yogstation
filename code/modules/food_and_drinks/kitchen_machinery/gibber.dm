@@ -188,7 +188,7 @@
 			newmeat.subjectname = sourcename
 			newmeat.reagents.add_reagent (/datum/reagent/consumable/nutriment, sourcenutriment / meat_produced) // Thehehe. Fat guys go first
 			if(occupant_volume)
-				occupant.reagents.trans_to(newmeat, occupant_volume / meat_produced, remove_blacklisted = TRUE)
+				occupant.reagents.trans_to(newmeat, occupant_volume / meat_produced, remove_unsynthable = TRUE)
 			if(sourcejob)
 				newmeat.subjectjob = sourcejob
 		allmeat[i] = newmeat

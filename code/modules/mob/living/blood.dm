@@ -213,9 +213,13 @@
 	if(!blood_id)
 		return FALSE
 
+	var/total_chems_amount = reagents.total_volume
+	for(var/datum/reagent/R in reagents.reagent_list)
+		if(R.hidden)
+			total_chems_amount -= R.volume
 	var/amount = total_amount
 	var/chems_amount = 0
-	var/blood_proportion = (blood_volume > 0 || reagents.total_volume > 0) ? blood_volume / (blood_volume + reagents.total_volume) : 1
+	var/blood_proportion = (blood_volume > 0 || total_chems_amount > 0) ? blood_volume / (blood_volume + total_chems_amount) : 1
 
 	if((1 - blood_proportion) * total_amount >= 0.1)
 		amount = total_amount * blood_proportion
@@ -247,7 +251,7 @@
 
 	AM.reagents.add_reagent(blood_id, amount, blood_data, bodytemperature)
 	if(chems_amount)
-		reagents.trans_to(AM, chems_amount)
+		reagents.trans_to(AM, chems_amount, remove_hidden = TRUE)
 	return TRUE
 
 

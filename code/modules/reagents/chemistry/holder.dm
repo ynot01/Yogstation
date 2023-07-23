@@ -192,12 +192,13 @@
   * * preserve_data - if preserve_data=0, the reagents data will be lost. Usefull if you use data for some strange stuff and don't want it to be transferred.
   * * no_react - passed through to [/datum/reagents/proc/add_reagent]
   * * mob/transfered_by - used for logging
-  * * remove_blacklisted - skips transferring of reagents with can_synth = FALSE
+  * * remove_unsynthable - skips transferring of reagents with can_synth = FALSE
+  * * remove_hidden - skips transferring of reagents with hidden = TRUE
   * * methods - passed through to [/datum/reagents/proc/react_single] and [/datum/reagent/proc/on_transfer]
   * * show_message - passed through to [/datum/reagents/proc/react_single]
   * * round_robin - if round_robin=TRUE, so transfer 5 from 15 water, 15 sugar and 15 plasma becomes 10, 15, 15 instead of 13.3333, 13.3333 13.3333. Good if you hate floating point errors
   */
-/datum/reagents/proc/trans_to(obj/target, amount = 1, multiplier = 1, preserve_data = TRUE, no_react = FALSE, mob/transfered_by, remove_blacklisted = FALSE)
+/datum/reagents/proc/trans_to(obj/target, amount = 1, multiplier = 1, preserve_data = TRUE, no_react = FALSE, mob/transfered_by, remove_unsynthable = FALSE, remove_hidden = FALSE)
 	var/list/cached_reagents = reagent_list
 	if(!target || !total_volume)
 		return
@@ -224,7 +225,9 @@
 	var/trans_data = null
 	for(var/reagent in cached_reagents)
 		var/datum/reagent/T = reagent
-		if(remove_blacklisted && !T.can_synth)
+		if(remove_unsynthable && !T.can_synth)
+			continue
+		if(remove_hidden && T.hidden)
 			continue
 		var/transfer_amount = T.volume * part
 		if(preserve_data)
@@ -721,7 +724,7 @@
 
 	if(isliving(my_atom))
 		//yogs start - snowflake synth check
-		if(!istype(R, /datum/reagent/medicine/synthflesh) && ishuman(my_atom)) 
+		if(!istype(R, /datum/reagent/medicine/synthflesh) && ishuman(my_atom))
 			var/mob/living/carbon/human/H = my_atom
 			if(istype(H.dna.species, /datum/species/synth))
 				return

@@ -246,6 +246,8 @@
 
 	if(altPatient.reagents.reagent_list.len)	//Chemical Analysis details.
 		for(var/datum/reagent/R in altPatient.reagents.reagent_list)
+			if(R.hidden && !isobserver(user))
+				continue
 			chemical_list += list(list("name" = R.name, "volume" = round(R.volume, 0.01)))
 			if(R.overdosed == 1)
 				overdose_list += list(list("name" = R.name))
